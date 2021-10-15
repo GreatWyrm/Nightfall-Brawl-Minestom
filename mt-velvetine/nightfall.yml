@@ -1,0 +1,58 @@
+name: Mt. Velvetine
+world: mt-velvetine
+
+lobby: [-912.5, 164, -1761.5, 180]
+dwarfspawn: [-646.5, 74, -1603.5, -140]
+
+compass:
+  Oil: [-454, 64, -1735]
+  Sawmill: [-462, 64, -1738]
+  Quarry: [-584, 54, -1758]
+  Gold: [-615, 44, -1758]
+  Blacksmith: [-566, 74, -1628]
+
+shrines:
+  shrine1:
+    name: Destroyed Town Shrine
+    mobspawn: [-603, 122, -1905, -60]
+    shrinecenter: [-445, 66, -1869]
+    shrineregion: shrine1Area
+    mobprot: mobprot1
+    shrineprot: shrineprot1
+
+  shrine2:
+    name: Pavilion Shrine
+    mobspawn: [-418, 64, -1853, 40]
+    shrinecenter: [-497.5, 68, -1735.5]
+    shrineregion: shrine2Area
+    mobprot: mobprot2
+    shrineprot: shrineprot2
+
+  shrine3:
+    name: Keep Shrine
+    mobspawn: [-509.5, 67, -1744.5, 50]
+    shrinecenter: [-637.5, 76, -1612.5]
+    shrineregion: shrine3Area
+    mobprot: mobprot3
+    shrineprot: none
+
+regions:
+  shrine1Area:
+    shape: sphere
+    parameters: [-445, 66, -1869, 6]
+  mobprot1:
+    expression: x <= -535 && z <= -1837
+  shrineprot1:
+    expression: z >= -1823 && x <= -420
+  shrine2Area:
+    shape: sphere
+    parameters: [-497.5, 68, -1735.5, 4]
+  mobprot2:
+    expression: x >= -410 || z <= -1824
+  shrineprot2:
+    expression: x <= -540 && z >= -1706
+  shrine3Area:
+    shape: sphere
+    parameters: [-637.5, 76, -1612.5, 6]
+  mobprot3:
+    expression: x >= -540 || z <= -1730
