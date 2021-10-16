@@ -12,7 +12,7 @@ public class CommandStarter {
     public static void registerAllCommands(CommandManager manager) {
         LOGGER.debug("Initializing Commands...");
         manager.register(new StopCommand());
-        manager.register(new WarpCommand());
+        manager.register(new WorldCommand());
 
         LOGGER.debug("Finished Initializing Commands.");
     }
