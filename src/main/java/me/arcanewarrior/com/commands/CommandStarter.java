@@ -13,6 +13,7 @@ public class CommandStarter {
         LOGGER.debug("Initializing Commands...");
         manager.register(new StopCommand());
         manager.register(new WorldCommand());
+        manager.register(new GamemodeCommand());
 
         LOGGER.debug("Finished Initializing Commands.");
     }

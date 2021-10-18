@@ -10,6 +10,4 @@ public class StartServer {
         MinecraftServer.LOGGER.info("Game Core loaded, starting server...");
         server.start("0.0.0.0", 25565);
     }
-
-
 }
