@@ -33,7 +33,7 @@ public class VoidChunkGenerator implements ChunkGenerator {
 
     @Override
     public void generateChunkData(@NotNull ChunkBatch batch, int chunkX, int chunkZ) {
-        batch.clear();
+
     }
 
     @Override
