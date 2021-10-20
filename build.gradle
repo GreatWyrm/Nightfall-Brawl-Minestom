@@ -3,8 +3,8 @@ plugins {
     id "com.github.johnrengelman.shadow" version "6.1.0"
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'me.arcanewarrior'
+version '0.0.1-ALPHA'
 
 repositories {
     mavenCentral()
@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Minestom:Minestom:13a8a22546'
+    implementation 'com.github.Minestom:Minestom:0b7b7283e6'
 }
 
 jar {

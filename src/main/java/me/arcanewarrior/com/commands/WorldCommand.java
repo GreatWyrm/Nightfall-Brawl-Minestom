@@ -5,8 +5,6 @@ import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.coordinate.Pos;
 
-import java.util.Locale;
-
 public class WorldCommand extends Command {
     public WorldCommand() {
         super("world");
@@ -29,13 +27,18 @@ public class WorldCommand extends Command {
             String worldName = context.get(thirdArg);
             switch(mode.toLowerCase()) {
                 case "list" -> sender.sendMessage("Current World List: " + WorldManager.getManager().getWorldListNames());
-                case "load" -> WorldManager.getManager().loadMinecraftWorld(worldName);
+                case "load" -> {
+                    // TODO: Better error checking, make sure the file exists before loading random things
+                    WorldManager.getManager().loadMinecraftWorld(worldName);
+                    sender.sendMessage("Loaded world " + worldName);
+                }
                 case "tp" -> {
                     if(sender.isPlayer()) {
-                        if(context.has(thirdArg)) {
-                            // Find world to load at with string - need world names
-                            sender.sendMessage("Not supported yet");
-                            sender.asPlayer().setInstance(WorldManager.getManager().getWorld(1),  new Pos(-912.5, 164, -1761.5));
+                        if(WorldManager.getManager().doesWorldExist(worldName)) {
+                            // Find better way of getting the respawn point for a world, this only works on mt-velvetine
+                            sender.asPlayer().setInstance(WorldManager.getManager().getWorld(worldName),  new Pos(-912.5, 164, -1761.5));
+                        } else {
+                            sender.sendMessage("No world is loaded with the name " + worldName);
                         }
                     } else {
                         sender.sendMessage("Only players can use this command!");

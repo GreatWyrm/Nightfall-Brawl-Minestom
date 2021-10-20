@@ -50,4 +50,8 @@ public class GameCore {
         return managers.getInstance(managerClass);
     }
 
+    public void stop() {
+        managers.values().forEach(Manager::stop);
+    }
+
 }

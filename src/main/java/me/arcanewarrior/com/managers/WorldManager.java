@@ -12,34 +12,43 @@ import net.minestom.server.world.biomes.Biome;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorldManager implements Manager {
 
     public static WorldManager getManager() { return GameCore.getGameCore().getManager(WorldManager.class); }
 
-    private static final List<InstanceContainer> worldList = new ArrayList<>();
+    private static final Map<String, InstanceContainer> worldList = new HashMap<>();
 
     private static final Pos DEFAULT_WORLD_SPAWN_POS = new Pos(0, 42, 0);
+    private static final String DEFAULT_WORLD_NAME = "default";
 
-    public InstanceContainer getWorld(int index) {
-        return worldList.get(index);
+    public InstanceContainer getWorld(String worldName) {
+        return worldList.get(worldName);
+    }
+
+    public boolean doesWorldExist(String worldName) {
+        return worldList.containsKey(worldName);
     }
 
     public void loadMinecraftWorld(String path) {
+        if(worldList.containsKey(path)) {
+            throw new IllegalArgumentException("World already exists with name: " + path + "!");
+        }
         AnvilLoader loader = new AnvilLoader(path);
         InstanceContainer newWorld = MinecraftServer.getInstanceManager().createInstanceContainer(loader);
         newWorld.setChunkGenerator(new VoidChunkGenerator());
-        worldList.add(newWorld);
+        worldList.put(path, newWorld);
     }
 
-    public void unloadMinecraftWorld(int index, boolean save) {
-        if(index == 0) {
-            throw new IllegalArgumentException("Cannot unload world at index 0, that's the default world!");
+    public void unloadMinecraftWorld(String worldName, boolean save) {
+        if(worldName.equals(DEFAULT_WORLD_NAME)) {
+            throw new IllegalArgumentException("Cannot unload default world!");
         }
-        InstanceContainer world = worldList.remove(index);
+        InstanceContainer world = worldList.remove(worldName);
         // Teleport any players to default world
         for(Player player : world.getPlayers()) {
             player.setInstance(getDefaultWorld(), DEFAULT_WORLD_SPAWN_POS);
@@ -53,16 +62,16 @@ public class WorldManager implements Manager {
 
     private void createDefaultWorld() {
         if(!worldList.isEmpty()) {
-            MinecraftServer.LOGGER.warn("Instance at worldList index 0 before creating the default world?!?!");
+            MinecraftServer.LOGGER.warn("WorldList not empty when creating the default world?!?!");
         }
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setChunkGenerator(new BasicChunkGenerator());
-        worldList.add(0, instanceContainer);
+        worldList.put(DEFAULT_WORLD_NAME, instanceContainer);
     }
 
     public InstanceContainer getDefaultWorld() {
-        return worldList.get(0);
+        return worldList.get(DEFAULT_WORLD_NAME);
     }
 
     @Override
@@ -72,8 +81,11 @@ public class WorldManager implements Manager {
 
     @Override
     public void stop() {
-        for(int i = 1; i < worldList.size(); i++) {
-            unloadMinecraftWorld(1, false);
+        for(String worldName : worldList.keySet()) {
+            // Skip unloading default world, we do that later
+            if(!worldName.equals(DEFAULT_WORLD_NAME)) {
+                unloadMinecraftWorld(worldName, false);
+            }
         }
         getDefaultWorld().saveChunksToStorage();
     }
@@ -108,10 +120,11 @@ public class WorldManager implements Manager {
             return "No Worlds Loaded";
         }
         builder.append("Default World");
-        // TODO: Attach a name to the world somehow, extend InstanceContainer and add a name parameter, or convert worldList into a Map<String, InstanceContainer> ?
-        for(int i = 1; i < worldList.size(); i++) {
-            builder.append(", ");
-            builder.append(worldList.get(i).getUniqueId());
+        for(String worldName : worldList.keySet()) {
+            if(!worldName.equals(DEFAULT_WORLD_NAME)) {
+                builder.append(", ");
+                builder.append(worldName);
+            }
         }
         return builder.toString();
     }
