@@ -3,6 +3,7 @@ package me.arcanewarrior.com;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import me.arcanewarrior.com.commands.CommandStarter;
+import me.arcanewarrior.com.managers.ItemManager;
 import me.arcanewarrior.com.managers.Manager;
 import me.arcanewarrior.com.managers.WorldManager;
 import net.minestom.server.MinecraftServer;
@@ -28,6 +29,7 @@ public class GameCore {
 
         ImmutableClassToInstanceMap.Builder<Manager> builder = ImmutableClassToInstanceMap.builder();
         builder.put(WorldManager.class, new WorldManager());
+        builder.put(ItemManager.class, new ItemManager());
 
         this.managers = builder.build();
 

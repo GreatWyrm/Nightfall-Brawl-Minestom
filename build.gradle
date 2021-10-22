@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Minestom:Minestom:0b7b7283e6'
+    implementation 'com.github.Minestom:Minestom:5030664ff9'
 }
 
 jar {
