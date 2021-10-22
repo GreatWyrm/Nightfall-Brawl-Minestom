@@ -7,6 +7,7 @@ import net.minestom.server.command.builder.Command;
 public class StopCommand extends Command {
     public StopCommand() {
         super("stop");
+        // TODO: Better feedback on command failure/success
         setDefaultExecutor((sender, context) -> {
             GameCore.getGameCore().stop();
             MinecraftServer.stopCleanly();

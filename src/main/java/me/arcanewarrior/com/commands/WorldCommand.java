@@ -2,16 +2,19 @@ package me.arcanewarrior.com.commands;
 
 import me.arcanewarrior.com.managers.WorldManager;
 import net.minestom.server.command.builder.Command;
+import net.minestom.server.command.builder.arguments.ArgumentString;
 import net.minestom.server.command.builder.arguments.ArgumentType;
+import net.minestom.server.command.builder.arguments.ArgumentWord;
 import net.minestom.server.coordinate.Pos;
 
 public class WorldCommand extends Command {
     public WorldCommand() {
         super("world");
+        // TODO: Better feedback on command failure/success
 
-        var modeArg = ArgumentType.Word("mode").from("list", "load", "tp");
+        ArgumentWord modeArg = ArgumentType.Word("mode").from("list", "load", "tp");
         modeArg.setCallback(((sender, exception) -> sender.sendMessage("Unknown mode: " + exception.getInput())));
-        var thirdArg = ArgumentType.String("world");
+        ArgumentString thirdArg = ArgumentType.String("world");
 
         setDefaultExecutor(((sender, context) -> sender.sendMessage("Usage: /world <list|load|tp> [world]")));
 
