@@ -14,8 +14,8 @@ repositories {
 
 dependencies {
     implementation 'com.github.Minestom:Minestom:1b4e0519ee'
-    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.29'
+     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.4'
 }
 
 jar {

@@ -15,7 +15,7 @@ public class StartServer {
         MinecraftServer.LOGGER.info("Config initialized, loading Game Core...");
         GameCore gameCore = new GameCore();
         MinecraftServer.LOGGER.info("Game Core loaded, starting server...");
-        server.start("0.0.0.0", ServerConfig.serverConfigData.getServerPort());
-        System.out.println("Test: " + ServerConfig.serverConfigData.getMaxPlayers());
+        server.start("0.0.0.0", ServerConfig.serverConfigData.serverPort());
+        System.out.println("Test: " + ServerConfig.serverConfigData.maxPlayers());
     }
 }

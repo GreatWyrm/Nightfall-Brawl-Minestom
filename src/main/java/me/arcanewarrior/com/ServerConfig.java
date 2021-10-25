@@ -1,32 +1,31 @@
 package me.arcanewarrior.com;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import net.minestom.server.MinecraftServer;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.util.Map;
 
 public class ServerConfig {
-    private static final String CONFIG_PATH = "server-config.yml";
+    private static final String CONFIG_PATH = "server-config.json";
     public static ServerConfigData serverConfigData = null;
 
     public static void loadServerConfig() {
         File file = new File(CONFIG_PATH);
-        Yaml yaml = new Yaml();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         if(file.exists()) {
             try {
-                serverConfigData = yaml.loadAs(new FileInputStream(CONFIG_PATH), ServerConfigData.class);
+                serverConfigData = mapper.readValue(file, ServerConfigData.class);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             MinecraftServer.LOGGER.info("No " + CONFIG_PATH + " (config file) found! Using defaults...");
-            Map<String, Object> configSettings = yaml.load(ServerConfig.class.getClassLoader().getResourceAsStream(CONFIG_PATH));
-            createDataFromConfiguration(configSettings);
             try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH));
-                bw.write(yaml.dumpAsMap(serverConfigData));
-                bw.close();
+                serverConfigData = mapper.readValue(ServerConfig.class.getClassLoader().getResourceAsStream(CONFIG_PATH), ServerConfigData.class);
+                mapper.writeValue(new FileWriter(CONFIG_PATH), serverConfigData);
             } catch (IOException e) {
                 e.printStackTrace();
             }
