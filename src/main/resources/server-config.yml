@@ -1,0 +1,4 @@
+# Essentially Server.Properties
+
+max-players: 50
+server-port: 25565
