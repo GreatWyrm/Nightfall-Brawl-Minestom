@@ -3,6 +3,7 @@ package me.arcanewarrior.com.serverbase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.resourcepack.ResourcePack;
 
 import java.io.File;
@@ -48,6 +49,7 @@ public class ServerConfig {
         } else {
             currentResourcePack = ResourcePack.optional(serverConfigData.resourcePackURL(), serverConfigData.resourcePackHash());
         }
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, playerLoginEvent -> playerLoginEvent.getPlayer().setResourcePack(currentResourcePack));
     }
 
     public static void writeServerConfig() {

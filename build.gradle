@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Minestom:Minestom:1b4e0519ee'
+    implementation 'com.github.Minestom:Minestom:484727d02a'
      // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.4'
 }
