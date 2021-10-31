@@ -22,6 +22,8 @@ public class ServerConfig {
         if(file.exists()) {
             try {
                 serverConfigData = mapper.readValue(file, ServerConfigData.class);
+                // Write config after loading, as we may be missing values in the config because of updating
+                writeServerConfig();
             } catch (IOException e) {
                 e.printStackTrace();
             }

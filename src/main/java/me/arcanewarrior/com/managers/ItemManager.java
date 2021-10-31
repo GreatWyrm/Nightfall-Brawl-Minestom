@@ -1,19 +1,14 @@
 package me.arcanewarrior.com.managers;
 
 import me.arcanewarrior.com.GameCore;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeOperation;
-import net.minestom.server.item.ItemHideFlag;
+import me.arcanewarrior.com.items.ItemLoader;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
-import net.minestom.server.item.attribute.AttributeSlot;
-import net.minestom.server.item.attribute.ItemAttribute;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ItemManager implements Manager {
 
@@ -23,17 +18,8 @@ public class ItemManager implements Manager {
 
     @Override
     public void initialize() {
-        itemList.put("test", ItemStack.builder(Material.DIAMOND_SWORD)
-                .displayName(Component.text("Entropy, the Blackened Blade", NamedTextColor.DARK_GRAY)) // Fully edgelord name
-                .lore(Component.text("A sword that bleeds away the lifeforce of anything it touches.", NamedTextColor.DARK_RED, TextDecoration.ITALIC))
-                .meta(itemMetaBuilder -> itemMetaBuilder.hideFlag(
-                        ItemHideFlag.HIDE_ATTRIBUTES,
-                        ItemHideFlag.HIDE_ENCHANTS,
-                        ItemHideFlag.HIDE_UNBREAKABLE
-                ).attributes(List.of(
-                        new ItemAttribute(UUID.randomUUID(), "Attack!?", Attribute.ATTACK_DAMAGE, AttributeOperation.ADDITION, 20, AttributeSlot.MAINHAND))))
-                .build()
-        );
+        ItemLoader itemLoader = new ItemLoader();
+        itemList.putAll(itemLoader.loadAllItems(Paths.get("test.json")));
     }
 
     public Set<String> getAllItemNames() {
