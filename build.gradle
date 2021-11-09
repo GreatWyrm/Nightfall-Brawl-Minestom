@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
 group 'me.arcanewarrior'
@@ -13,9 +13,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Minestom:Minestom:484727d02a'
+    implementation 'com.github.Minestom:Minestom:ae08ac2987'
      // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.4'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
 }
 
 jar {
