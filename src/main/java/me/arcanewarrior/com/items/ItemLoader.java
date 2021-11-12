@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.attribute.Attribute;
+import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.item.attribute.AttributeSlot;
+import net.minestom.server.item.attribute.ItemAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class ItemLoader {
 
@@ -90,7 +92,57 @@ public class ItemLoader {
         String itemName = itemNameJSON == null ? ERROR_NAME : itemNameJSON.asText(ERROR_NAME);
 
         // TODO: Lore
-        // TODO: Attributes
+
+        ArrayList<ItemAttribute> attributes = new ArrayList<>();
+        JsonNode attributeNode = itemNode.get("attributes");
+        if(attributeNode != null && attributeNode.isArray()) {
+            for (JsonNode attribute : attributeNode) {
+                if (attribute.isObject()) {
+                    // Get particular fields
+                    JsonNode attributeName = attribute.get("attribute");
+                    if (attributeName == null || !attributeName.isTextual()) {
+                        logger.warn("Error loading item, attribute field is missing or wrong value type!");
+                        continue;
+                    }
+                    JsonNode value = attribute.get("operation");
+                    if (value == null || !value.isNumber()) {
+                        logger.warn("Error loading item, attribute field is missing or wrong value type!");
+                        continue;
+                    }
+                    // Optional
+                    JsonNode operationName = attribute.get("operation");
+                    JsonNode slotName = attribute.get("slot");
+
+                    Attribute actual = Attribute.fromKey("generic." + attributeName.asText().toLowerCase());
+                    if (actual == null) {
+                        logger.warn("Unknown attribute name: " + attributeName.asText());
+                        continue;
+                    }
+                    AttributeOperation operation = AttributeOperation.ADDITION;
+                    if (operationName != null) {
+                        if (operationName.isNumber()) {
+                            operation = AttributeOperation.fromId(operationName.asInt());
+                            if (operation == null) {
+                                logger.warn("Unknown attribute operation id: " + operationName.asInt());
+                                continue;
+                            }
+                        }
+                    }
+                    AttributeSlot slot = AttributeSlot.MAINHAND;
+                    if (slotName != null && slotName.isTextual()) {
+                        try {
+                            slot = AttributeSlot.valueOf(slotName.asText().toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            logger.warn("Unknown attribute slot name: " + slotName.asText());
+                            continue;
+                        }
+                    }
+                    var newAttribute = new ItemAttribute(UUID.randomUUID(), "name", actual, operation, value.asInt(), slot);
+                    attributes.add(newAttribute);
+                }
+            }
+        }
+
         // TODO: Enchants
 
         return ItemStack.builder(baseMaterial)
@@ -101,7 +153,11 @@ public class ItemLoader {
                         .hideFlag(
                                 ItemHideFlag.HIDE_ATTRIBUTES,
                                 ItemHideFlag.HIDE_ENCHANTS,
-                                ItemHideFlag.HIDE_UNBREAKABLE))
+                                ItemHideFlag.HIDE_UNBREAKABLE)
+                        .attributes(
+                            attributes
+                        )
+                )
                 .amount(1)
                 .build();
     }
