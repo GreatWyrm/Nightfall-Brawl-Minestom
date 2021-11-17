@@ -3,6 +3,7 @@ package me.arcanewarrior.com;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import me.arcanewarrior.com.commands.CommandStarter;
+import me.arcanewarrior.com.events.MainEventListener;
 import me.arcanewarrior.com.managers.ItemManager;
 import me.arcanewarrior.com.managers.Manager;
 import me.arcanewarrior.com.managers.WorldManager;
@@ -39,6 +40,9 @@ public class GameCore {
             playerLoginEvent.setSpawningInstance(WorldManager.getManager().getDefaultWorld());
             playerLoginEvent.getPlayer().setRespawnPoint(new Pos(0, 42, 0));
         });
+
+        MainEventListener listener = new MainEventListener();
+        listener.registerAllEvents();
 
         gameCore = this;
     }
