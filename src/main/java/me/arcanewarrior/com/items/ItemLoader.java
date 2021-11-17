@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeOperation;
+import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -86,10 +87,13 @@ public class ItemLoader {
         }
 
         JsonNode formatStyleJSON = itemNode.get("style");
-        ItemFormatStyle formatStyle = ItemFormatStyle.valueOf(formatStyleJSON == null ? "DEFAULT" : formatStyleJSON.asText("DEFAULT"));
+        ItemFormatStyle formatStyle = ItemFormatStyle.valueOf(formatStyleJSON == null ? "DEFAULT" : formatStyleJSON.asText("DEFAULT").toUpperCase());
 
         JsonNode itemNameJSON = itemNode.get("name");
         String itemName = itemNameJSON == null ? ERROR_NAME : itemNameJSON.asText(ERROR_NAME);
+
+        JsonNode modelDataJson = itemNode.get("custommodeldata");
+        int modelData = modelDataJson == null ? 0 : modelDataJson.asInt(0);
 
         // TODO: Lore
 
@@ -104,9 +108,9 @@ public class ItemLoader {
                         logger.warn("Error loading item, attribute field is missing or wrong value type!");
                         continue;
                     }
-                    JsonNode value = attribute.get("operation");
+                    JsonNode value = attribute.get("amount");
                     if (value == null || !value.isNumber()) {
-                        logger.warn("Error loading item, attribute field is missing or wrong value type!");
+                        logger.warn("Error loading item, amount field is missing or wrong value type!");
                         continue;
                     }
                     // Optional
@@ -137,13 +141,25 @@ public class ItemLoader {
                             continue;
                         }
                     }
-                    var newAttribute = new ItemAttribute(UUID.randomUUID(), "name", actual, operation, value.asInt(), slot);
+                    var newAttribute = new ItemAttribute(UUID.randomUUID(), "name", actual, operation, value.asDouble(), slot);
                     attributes.add(newAttribute);
                 }
             }
         }
 
-        // TODO: Enchants
+        HashMap<Enchantment, Short> enchantments = new HashMap<>();
+        JsonNode enchantmentsNode = itemNode.get("enchantments");
+        if(enchantmentsNode != null && enchantmentsNode.isObject()) {
+            for (Iterator<Map.Entry<String, JsonNode>> it = enchantmentsNode.fields(); it.hasNext(); ) {
+                Map.Entry<String, JsonNode> enchantment = it.next();
+                // String holds enchant name, JsonNode holds enchant value
+                var enchant = Enchantment.fromNamespaceId("minecraft:"+enchantment.getKey());
+                if(enchant != null &&
+                        enchantment.getValue() != null && enchantment.getValue().isNumber()) {
+                    enchantments.put(enchant, enchantment.getValue().shortValue());
+                }
+            }
+        }
 
         return ItemStack.builder(baseMaterial)
                 .displayName(Component.text(itemName,
@@ -151,12 +167,14 @@ public class ItemLoader {
                                 TextDecoration.BOLD.as(false), TextDecoration.STRIKETHROUGH.as(false), TextDecoration.UNDERLINED.as(false))))
                 .meta(itemMetaBuilder -> itemMetaBuilder
                         .hideFlag(
-                                ItemHideFlag.HIDE_ATTRIBUTES,
-                                ItemHideFlag.HIDE_ENCHANTS,
-                                ItemHideFlag.HIDE_UNBREAKABLE)
-                        .attributes(
-                            attributes
+                                //ItemHideFlag.HIDE_ATTRIBUTES,
+                                //ItemHideFlag.HIDE_ENCHANTS,
+                                ItemHideFlag.HIDE_UNBREAKABLE
                         )
+                        .attributes(attributes)
+                        .enchantments(enchantments)
+                        .customModelData(modelData)
+                        //.unbreakable(true)
                 )
                 .amount(1)
                 .build();

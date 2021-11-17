@@ -1,6 +1,16 @@
 {
   "entropy": {
     "material": "diamond_sword",
-    "name": "Entropy"
+    "name": "Entropy",
+    "attributes": [
+      {
+        "attribute": "attack_damage",
+        "amount": 15
+      }
+    ],
+    "enchantments": {
+      "sharpness": 5,
+      "fire_aspect": 2
+    }
   }
 }
