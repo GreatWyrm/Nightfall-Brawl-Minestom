@@ -7,10 +7,12 @@ import me.arcanewarrior.com.events.MainEventListener;
 import me.arcanewarrior.com.managers.ItemManager;
 import me.arcanewarrior.com.managers.Manager;
 import me.arcanewarrior.com.managers.WorldManager;
+import me.arcanewarrior.com.serverbase.ServerConfig;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minestom.server.event.server.ServerListPingEvent;
 
 // The Main Managing Class for the entire game
 public class GameCore {
@@ -40,6 +42,9 @@ public class GameCore {
             playerLoginEvent.setSpawningInstance(WorldManager.getManager().getDefaultWorld());
             playerLoginEvent.getPlayer().setRespawnPoint(new Pos(0, 42, 0));
         });
+
+
+        MinecraftServer.getGlobalEventHandler().addListener(ServerListPingEvent.class, serverListPingEvent -> serverListPingEvent.setResponseData(ServerConfig.getServerResponseData()));
 
         MainEventListener listener = new MainEventListener();
         listener.registerAllEvents();

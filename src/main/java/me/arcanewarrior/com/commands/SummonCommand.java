@@ -3,6 +3,7 @@ package me.arcanewarrior.com.commands;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.EntityCreature;
+import net.minestom.server.entity.Player;
 
 public class SummonCommand extends Command {
     public SummonCommand() {
@@ -11,10 +12,13 @@ public class SummonCommand extends Command {
         var entityType= ArgumentType.EntityType("type");
 
         addSyntax((sender, context) -> {
-            if(sender.isPlayer()) {
-                var player = sender.asPlayer();
+            if(sender instanceof Player player) {
                 EntityCreature entity = new EntityCreature(context.get(entityType));
-                entity.setInstance(player.getInstance(), player.getPosition());
+                if(player.getInstance() == null) {
+                    player.sendMessage("You cannot summon creatures while in a null instance!");
+                } else {
+                    entity.setInstance(player.getInstance(), player.getPosition());
+                }
             } else {
                 sender.sendMessage("Console cannot use this command!");
             }

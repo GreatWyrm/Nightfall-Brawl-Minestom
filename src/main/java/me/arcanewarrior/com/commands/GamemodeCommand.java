@@ -30,10 +30,10 @@ public class GamemodeCommand extends Command {
         setDefaultExecutor((sender, context) -> sender.sendMessage(Component.text("Usage: /gamemode <gamemode> [targets]", NamedTextColor.RED), MessageType.SYSTEM));
 
         addSyntax((sender, context) -> {
-            if(sender.isPlayer()) {
+            if(sender instanceof Player player) {
                 GameMode mode = context.get(gamemode);
-                sender.asPlayer().setGameMode(mode);
-                sender.sendMessage(Component.text("Set gamemode to ", NamedTextColor.GREEN).append(Component.text(mode.name(), NamedTextColor.YELLOW)), MessageType.SYSTEM);
+                player.setGameMode(mode);
+                player.sendMessage(Component.text("Set gamemode to ", NamedTextColor.GREEN).append(Component.text(mode.name(), NamedTextColor.YELLOW)), MessageType.SYSTEM);
             } else {
                 sender.sendMessage(Component.text("Console cannot execute gamemode command without targets!", NamedTextColor.RED));
             }

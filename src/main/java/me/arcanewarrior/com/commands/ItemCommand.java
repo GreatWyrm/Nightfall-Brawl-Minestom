@@ -26,9 +26,9 @@ public class ItemCommand extends Command {
 
         addSyntax(((sender, context) -> {
             if ("give".equalsIgnoreCase(context.get(modeArg))) {
-                if (sender.isPlayer()) {
+                if (sender instanceof Player player) {
                     // TODO: Create an addInventory method so you aren't directly setting a slot
-                    sender.asPlayer().getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg)));
+                    player.getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg)));
                 } else {
                     sender.sendMessage("Console cannot use this command!");
                 }

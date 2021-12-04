@@ -6,6 +6,7 @@ import net.minestom.server.command.builder.arguments.ArgumentString;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.ArgumentWord;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Player;
 
 public class WorldCommand extends Command {
     public WorldCommand() {
@@ -36,10 +37,10 @@ public class WorldCommand extends Command {
                     sender.sendMessage("Loaded world " + worldName);
                 }
                 case "tp" -> {
-                    if(sender.isPlayer()) {
+                    if(sender instanceof Player player) {
                         if(WorldManager.getManager().doesWorldExist(worldName)) {
                             // Find better way of getting the respawn point for a world, this only works on mt-velvetine
-                            sender.asPlayer().setInstance(WorldManager.getManager().getWorld(worldName),  new Pos(-912.5, 164, -1761.5));
+                            player.setInstance(WorldManager.getManager().getWorld(worldName),  new Pos(-912.5, 164, -1761.5));
                         } else {
                             sender.sendMessage("No world is loaded with the name " + worldName);
                         }

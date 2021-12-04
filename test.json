@@ -1,7 +1,7 @@
 {
-  "entropy": {
+  "shiny": {
     "material": "diamond_sword",
-    "name": "Entropy",
+    "name": "Shiny",
     "attributes": [
       {
         "attribute": "attack_damage",

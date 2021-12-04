@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minestom.server.ping.ResponseData;
 import net.minestom.server.resourcepack.ResourcePack;
 
 import java.io.File;
@@ -14,6 +15,7 @@ public class ServerConfig {
     private static final String CONFIG_PATH = "server-config.json";
     public static ServerConfigData serverConfigData = null;
     public static ResourcePack currentResourcePack = null;
+    private static final ResponseData responseData = new ResponseData();
 
     public static void loadServerConfig() {
         File file = new File(CONFIG_PATH);
@@ -36,6 +38,7 @@ public class ServerConfig {
                 e.printStackTrace();
             }
         }
+        responseData.setMaxPlayer(serverConfigData.maxPlayers());
     }
 
     public static void loadResourcePack() {
@@ -63,5 +66,8 @@ public class ServerConfig {
             MinecraftServer.LOGGER.info("Failed to write out server config file!");
             e.printStackTrace();
         }
+    }
+    public static ResponseData getServerResponseData() {
+        return responseData;
     }
 }

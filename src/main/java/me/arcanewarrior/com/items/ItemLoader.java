@@ -27,7 +27,6 @@ import java.util.*;
 public class ItemLoader {
 
     private final Logger logger = LoggerFactory.getLogger(ItemLoader.class);
-    private final String ERROR_NAME = "Error: Name not Specified";
 
     public ItemLoader() {
 
@@ -90,12 +89,13 @@ public class ItemLoader {
         ItemFormatStyle formatStyle = ItemFormatStyle.valueOf(formatStyleJSON == null ? "DEFAULT" : formatStyleJSON.asText("DEFAULT").toUpperCase());
 
         JsonNode itemNameJSON = itemNode.get("name");
+        String ERROR_NAME = "Error: Name not Specified";
         String itemName = itemNameJSON == null ? ERROR_NAME : itemNameJSON.asText(ERROR_NAME);
 
         JsonNode modelDataJson = itemNode.get("custommodeldata");
         int modelData = modelDataJson == null ? 0 : modelDataJson.asInt(0);
 
-        // TODO: Lore
+        // TODO: Lore - And remove Drk
 
         ArrayList<ItemAttribute> attributes = new ArrayList<>();
         JsonNode attributeNode = itemNode.get("attributes");

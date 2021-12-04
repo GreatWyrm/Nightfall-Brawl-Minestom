@@ -7,22 +7,25 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.attribute.ItemAttribute;
+import org.jetbrains.annotations.NotNull;
 
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DamageProcessor {
 
 
-    public void handleEntityDamage(EntityDamageEvent event) {
+    public void handleEntityDamage(@NotNull EntityDamageEvent event) {
         System.out.println("Entity damage event was called");
         System.out.println("DamageType: " + event.getDamageType());
         System.out.println("Damage Amount: " + event.getDamage());
     }
 
-    public void processEntityAttackEvent(EntityAttackEvent event) {
+    public void processEntityAttackEvent(@NotNull EntityAttackEvent event) {
         Entity attacker = event.getEntity();
         Entity attackee = event.getTarget();
         if(attackee instanceof LivingEntity targetLiving) {
@@ -48,6 +51,10 @@ public class DamageProcessor {
                                 // Attribute operations aren't taken into consideration
                                 totalDamage += attribute.getValue();
                             }
+                            if(slot == EquipmentSlot.MAIN_HAND) {
+                                short fireAspect = stack.getMeta().getEnchantmentMap().getOrDefault(Enchantment.fromNamespaceId("fire_aspect"), (short) 0);
+                                targetLiving.setFireForDuration(4*fireAspect, ChronoUnit.SECONDS);
+                            }
                         }
                     }
                 }
@@ -57,12 +64,8 @@ public class DamageProcessor {
                     totalDamage = 1;
                 }
 
-                targetLiving.damage(DamageType.fromEntity(event.getEntity()),
-                        totalDamage
-                );
+                targetLiving.damage(DamageType.fromEntity(event.getEntity()), totalDamage);
             }
-
-
         }
     }
 
