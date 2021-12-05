@@ -95,7 +95,16 @@ public class ItemLoader {
         JsonNode modelDataJson = itemNode.get("custommodeldata");
         int modelData = modelDataJson == null ? 0 : modelDataJson.asInt(0);
 
-        // TODO: Lore - And remove Drk
+        ArrayList<Component> lore = new ArrayList<>();
+        JsonNode loreNode = itemNode.get("lore");
+        if(loreNode != null && loreNode.isTextual()) {
+            // TODO: Apply variables to string
+            // Unfortunately, reading in a \n directly to a component just produces a line feed icon
+            String[] lines = loreNode.asText().split("\n");
+            for(String line : lines) {
+                lore.add(Component.text(line, Style.style(formatStyle.getLoreColor(), TextDecoration.ITALIC.as(false))));
+            }
+        }
 
         ArrayList<ItemAttribute> attributes = new ArrayList<>();
         JsonNode attributeNode = itemNode.get("attributes");
@@ -174,7 +183,8 @@ public class ItemLoader {
                         .attributes(attributes)
                         .enchantments(enchantments)
                         .customModelData(modelData)
-                        //.unbreakable(true)
+                        .unbreakable(true)
+                        .lore(lore)
                 )
                 .amount(1)
                 .build();
