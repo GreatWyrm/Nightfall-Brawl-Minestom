@@ -27,8 +27,6 @@ public class GameCore {
 
     public GameCore() {
 
-        CommandStarter.registerAllCommands(MinecraftServer.getCommandManager());
-
         ImmutableClassToInstanceMap.Builder<Manager> builder = ImmutableClassToInstanceMap.builder();
         builder.put(WorldManager.class, new WorldManager());
         builder.put(ItemManager.class, new ItemManager());
@@ -36,6 +34,10 @@ public class GameCore {
         this.managers = builder.build();
 
         managers.values().forEach(Manager::initialize);
+
+        gameCore = this;
+
+        CommandStarter.registerAllCommands(MinecraftServer.getCommandManager());
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(PlayerLoginEvent.class, playerLoginEvent -> {
@@ -49,7 +51,6 @@ public class GameCore {
         MainEventListener listener = new MainEventListener();
         listener.registerAllEvents();
 
-        gameCore = this;
     }
 
     public <S extends Manager> S getManager(Class<S> managerClass) {

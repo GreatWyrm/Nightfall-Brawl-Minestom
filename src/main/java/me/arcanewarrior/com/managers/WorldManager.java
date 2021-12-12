@@ -8,14 +8,13 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.instance.*;
 import net.minestom.server.instance.batch.ChunkBatch;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.tag.Tag;
 import net.minestom.server.world.biomes.Biome;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jglrxavpok.hephaistos.nbt.NBTCompound;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WorldManager implements Manager {
 
@@ -34,12 +33,16 @@ public class WorldManager implements Manager {
         return worldList.containsKey(worldName);
     }
 
+    public Set<String> getLoadedWorldNames() { return worldList.keySet(); }
+
     public void loadMinecraftWorld(String path) {
         if(worldList.containsKey(path)) {
             throw new IllegalArgumentException("World already exists with name: " + path + "!");
         }
         AnvilLoader loader = new AnvilLoader(path);
         InstanceContainer newWorld = MinecraftServer.getInstanceManager().createInstanceContainer(loader);
+        // Required for loading in the level.dat file information
+        loader.loadInstance(newWorld);
         newWorld.setChunkGenerator(new VoidChunkGenerator());
         worldList.put(path, newWorld);
     }
@@ -60,6 +63,18 @@ public class WorldManager implements Manager {
         MinecraftServer.getInstanceManager().unregisterInstance(world);
     }
 
+    public Pos getWorldSpawnPoint(String worldName) {
+        if(!doesWorldExist(worldName)) return null;
+
+        InstanceContainer world = worldList.get(worldName);
+        NBTCompound worldLevelDat = world.getTag(Tag.NBT);
+        NBTCompound data = worldLevelDat.getCompound("Data");
+        int x = data.getInt("SpawnX");
+        int y = data.getInt("SpawnY");
+        int z = data.getInt("SpawnZ");
+        return new Pos(x, y, z);
+    }
+
     private void createDefaultWorld() {
         if(!worldList.isEmpty()) {
             MinecraftServer.LOGGER.warn("WorldList not empty when creating the default world?!?!");
@@ -67,6 +82,14 @@ public class WorldManager implements Manager {
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setChunkGenerator(new BasicChunkGenerator());
+        // Set NBT Tag for proper teleporting
+        NBTCompound data = new NBTCompound();
+        data.setInt("SpawnX", 0);
+        data.setInt("SpawnY", 42);
+        data.setInt("SpawnZ", 0);
+        NBTCompound parent = new NBTCompound();
+        parent.set("Data", data);
+        instanceContainer.setTag(Tag.NBT,parent);
         worldList.put(DEFAULT_WORLD_NAME, instanceContainer);
     }
 
@@ -114,7 +137,7 @@ public class WorldManager implements Manager {
         }
     }
 
-    public String getWorldListNames() {
+    public String getFormattedWorldNameString() {
         StringBuilder builder = new StringBuilder();
         if(worldList.isEmpty()) {
             return "No Worlds Loaded";
