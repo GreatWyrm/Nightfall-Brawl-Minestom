@@ -7,8 +7,11 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.entity.EntityShootEvent;
+import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import net.minestom.server.item.attribute.ItemAttribute;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,14 +48,14 @@ public class DamageProcessor {
                         // Sum damage from attribute
                         for(ItemAttribute attribute : stack.getMeta().getAttributes()) {
                             // If slots match and the attribute is attack damage
-                            if(slot.equals(EquipmentSlot.fromAttributeSlot(attribute.getSlot()))
+                            if (slot.equals(EquipmentSlot.fromAttributeSlot(attribute.getSlot()))
                                     && attribute.getAttribute().equals(Attribute.ATTACK_DAMAGE)) {
 
                                 // Attribute operations aren't taken into consideration
                                 totalDamage += attribute.getValue();
                             }
                             if(slot == EquipmentSlot.MAIN_HAND) {
-                                short fireAspect = stack.getMeta().getEnchantmentMap().getOrDefault(Enchantment.fromNamespaceId("fire_aspect"), (short) 0);
+                                short fireAspect = stack.getMeta().getEnchantmentMap().getOrDefault(Enchantment.FIRE_ASPECT, (short) 0);
                                 targetLiving.setFireForDuration(4*fireAspect, ChronoUnit.SECONDS);
                             }
                         }
@@ -67,6 +70,13 @@ public class DamageProcessor {
                 targetLiving.damage(DamageType.fromEntity(event.getEntity()), totalDamage);
             }
         }
+    }
+
+    public void handleBowFire(@NotNull EntityShootEvent event) {
+        System.out.println("Entity shoot event was called");
+        System.out.println("Spread: " + event.getSpread());
+        System.out.println("Power: " + event.getPower());
+        System.out.println("Projectile: " + event.getProjectile().getEntityType().name());
     }
 
 }

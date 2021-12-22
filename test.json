@@ -13,5 +13,15 @@
       "sharpness": 5,
       "fire_aspect": 2
     }
+  },
+  "yllanter": {
+    "material": "bow",
+    "name": "Yllanter",
+    "lore": "The first bow"
+  },
+  "galvan": {
+    "material": "arrow",
+    "name": "Galvan",
+    "lore": "The first arrow"
   }
 }

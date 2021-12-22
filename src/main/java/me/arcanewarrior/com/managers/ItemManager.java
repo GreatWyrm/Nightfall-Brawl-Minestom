@@ -27,10 +27,14 @@ public class ItemManager implements Manager {
     }
 
     public @NotNull ItemStack getItem(String name) {
+        return getItem(name, 1);
+    }
+
+    public @NotNull ItemStack getItem(String name, int amount) {
         if(!itemList.containsKey(name)) {
             throw new IllegalArgumentException("Tried to get item '" + name + "', but it doesn't exist!");
         } else {
-            return itemList.get(name);
+            return itemList.get(name).withAmount(amount);
         }
     }
 

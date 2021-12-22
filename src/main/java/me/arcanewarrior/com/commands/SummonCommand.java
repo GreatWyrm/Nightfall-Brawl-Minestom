@@ -18,6 +18,12 @@ public class SummonCommand extends Command {
                     player.sendMessage("You cannot summon creatures while in a null instance!");
                 } else {
                     entity.setInstance(player.getInstance(), player.getPosition());
+                    /* entity.addAIGroup(
+                            new EntityAIGroupBuilder()
+                                    .addGoalSelector(new MeleeAttackGoal(entity, 2, 2, ChronoUnit.SECONDS))
+                                    .addTargetSelector(new ClosestEntityTarget(entity, 15, Player.class))
+                                    .build()
+                    ); */
                 }
             } else {
                 sender.sendMessage("Console cannot use this command!");

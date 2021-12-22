@@ -6,6 +6,8 @@ import net.minestom.server.command.builder.arguments.ArgumentString;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.ArgumentWord;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
+import net.minestom.server.command.builder.arguments.minecraft.ArgumentIntRange;
+import net.minestom.server.command.builder.arguments.number.ArgumentInteger;
 import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
@@ -19,35 +21,38 @@ public class ItemCommand extends Command {
 
         ArgumentWord modeArg = ArgumentType.Word("mode").from("give");
         ArgumentString nameArg = ArgumentType.String("name");
+        ArgumentInteger stackNum = ArgumentType.Integer("amount");
+        stackNum.setDefaultValue(1);
         ArgumentEntity playerArg = ArgumentType.Entity("targets").onlyPlayers(true);
+
         nameArg.setSuggestionCallback((sender, context, suggestion) -> ItemManager.getManager().getAllItemNames().forEach((itemName) -> suggestion.addEntry(new SuggestionEntry(itemName))));
 
-        setDefaultExecutor(((sender, context) -> sender.sendMessage("Usage: /item [give] <name>")));
+        setDefaultExecutor(((sender, context) -> sender.sendMessage("Usage: /item [give] [amount] <name>")));
 
         addSyntax(((sender, context) -> {
             if ("give".equalsIgnoreCase(context.get(modeArg))) {
                 if (sender instanceof Player player) {
                     // TODO: Create an addInventory method so you aren't directly setting a slot
-                    player.getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg)));
+                    player.getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg), context.get(stackNum)));
                 } else {
                     sender.sendMessage("Console cannot use this command!");
                 }
             } else {
                 sender.sendMessage("Unknown Mode " + context.get(modeArg));
             }
-        }), modeArg, nameArg);
+        }), modeArg, nameArg, stackNum);
 
         addSyntax(((sender, context) -> {
             if ("give".equalsIgnoreCase(context.get(modeArg))) {
                 List<Entity> entityList = context.get(playerArg).find(sender);
                 entityList.forEach((entity -> {
                     if(entity instanceof Player player) {
-                        player.getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg)));
+                        player.getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg), context.get(stackNum)));
                     }
                 }));
             } else {
                 sender.sendMessage("Unknown Mode " + context.get(modeArg));
             }
-        }), modeArg, nameArg, playerArg);
+        }), modeArg, nameArg, stackNum, playerArg);
     }
 }
