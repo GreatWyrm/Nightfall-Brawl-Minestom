@@ -1,5 +1,6 @@
 package me.arcanewarrior.com.damage;
 
+import me.arcanewarrior.com.damage.bow.Arrow;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EquipmentSlot;
@@ -8,10 +9,8 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityShootEvent;
-import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.item.attribute.ItemAttribute;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,15 +67,27 @@ public class DamageProcessor {
                 }
 
                 targetLiving.damage(DamageType.fromEntity(event.getEntity()), totalDamage);
+            } else if(attacker instanceof Arrow arrow) {
+                targetLiving.damage(DamageType.fromProjectile(arrow.getShooter(), arrow), arrow.getFinalDamage());
             }
         }
     }
 
-    public void handleBowFire(@NotNull EntityShootEvent event) {
-        System.out.println("Entity shoot event was called");
-        System.out.println("Spread: " + event.getSpread());
-        System.out.println("Power: " + event.getPower());
-        System.out.println("Projectile: " + event.getProjectile().getEntityType().name());
+    public void handleEntityShoot(@NotNull EntityShootEvent event) {
+        Entity shooter = event.getEntity();
+        Entity projectile = event.getProjectile();
+        // If this is an arrow, set damage and multiplier properly
+        if(shooter instanceof LivingEntity livingEntity && projectile instanceof Arrow arrow) {
+            ItemStack bowItem = livingEntity.getItemInMainHand();
+            arrow.setBaseDamage(2);
+            short powerLevel = bowItem.getMeta().getEnchantmentMap().getOrDefault(Enchantment.POWER, (short) 0);
+            double power = event.getPower();
+            if(powerLevel > 0) {
+                // Formula from minecraft wiki: Power Damage multiplier = 1 + powerLevel * .25
+                arrow.setMultiplier(((powerLevel + 1) * .25 + 1) * power);
+            } else {
+                arrow.setMultiplier(power);
+            }
+        }
     }
-
 }

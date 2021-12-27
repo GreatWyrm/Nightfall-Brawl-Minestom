@@ -37,6 +37,9 @@ public class BowMechanics {
         }
 
         Arrow arrow = new Arrow(player);
+        if(power >= 0.98) {
+            arrow.setCritical(true);
+        }
         if(player.getInstance() != null) {
             // Magic Math, with thanks to https://github.com/Bloepiloepi/MinestomPvP/blob/f470919d55a165d256ae0b92deff4f7d62ae2809/src/main/java/io/github/bloepiloepi/pvp/projectile/ProjectileListener.java#L246
             Pos position = player.getPosition().add(0D, player.getEyeHeight(), 0D);

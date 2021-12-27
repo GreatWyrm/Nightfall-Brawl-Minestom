@@ -32,8 +32,7 @@ public class ItemCommand extends Command {
         addSyntax(((sender, context) -> {
             if ("give".equalsIgnoreCase(context.get(modeArg))) {
                 if (sender instanceof Player player) {
-                    // TODO: Create an addInventory method so you aren't directly setting a slot
-                    player.getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg), context.get(stackNum)));
+                    ItemManager.getManager().giveItemToPlayer(context.get(nameArg), context.get(stackNum), player);
                 } else {
                     sender.sendMessage("Console cannot use this command!");
                 }
@@ -45,11 +44,11 @@ public class ItemCommand extends Command {
         addSyntax(((sender, context) -> {
             if ("give".equalsIgnoreCase(context.get(modeArg))) {
                 List<Entity> entityList = context.get(playerArg).find(sender);
-                entityList.forEach((entity -> {
+                entityList.forEach(entity -> {
                     if(entity instanceof Player player) {
-                        player.getInventory().setItemInMainHand(ItemManager.getManager().getItem(context.get(nameArg), context.get(stackNum)));
+                        ItemManager.getManager().giveItemToPlayer(context.get(nameArg), context.get(stackNum), player);
                     }
-                }));
+                });
             } else {
                 sender.sendMessage("Unknown Mode " + context.get(modeArg));
             }

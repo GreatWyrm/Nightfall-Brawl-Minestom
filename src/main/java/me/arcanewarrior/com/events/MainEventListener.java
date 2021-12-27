@@ -27,7 +27,7 @@ public class MainEventListener {
                 .handler(processer::processEntityAttackEvent)
                 .build());
         node.addListener(EventListener.builder(EntityShootEvent.class)
-                .handler(processer::handleBowFire)
+                .handler(processer::handleEntityShoot)
                 .build());
         EventNode<EntityEvent> bowNode = EventNode.type("bow-events", EventFilter.ENTITY);
         node.addChild(bowNode);
