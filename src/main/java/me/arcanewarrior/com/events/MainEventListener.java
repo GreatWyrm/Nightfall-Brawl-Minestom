@@ -1,7 +1,7 @@
 package me.arcanewarrior.com.events;
 
-import me.arcanewarrior.com.damage.bow.BowMechanics;
 import me.arcanewarrior.com.damage.DamageProcessor;
+import me.arcanewarrior.com.damage.bow.BowMechanics;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventListener;

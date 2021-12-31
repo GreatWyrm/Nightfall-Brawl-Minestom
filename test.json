@@ -23,5 +23,9 @@
     "material": "arrow",
     "name": "Galvan",
     "lore": "The first arrow"
+  },
+  "nyneve": {
+    "material": "diamond_sword",
+    "name": "Nyneve"
   }
 }

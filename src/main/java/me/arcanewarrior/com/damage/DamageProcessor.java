@@ -15,8 +15,6 @@ import net.minestom.server.item.attribute.ItemAttribute;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DamageProcessor {
 
@@ -34,15 +32,9 @@ public class DamageProcessor {
 
             // Calculate damage amount
             if(attacker instanceof LivingEntity attackerLiving) {
-                // Get items in hands and armor slots
-                Map<EquipmentSlot, ItemStack> checkedItems = new HashMap<>();
-                for(EquipmentSlot slot : EquipmentSlot.values()) {
-                    checkedItems.put(slot, attackerLiving.getEquipment(slot));
-                }
                 int totalDamage = 0;
-                for(Map.Entry<EquipmentSlot, ItemStack> slotStackPair : checkedItems.entrySet()) {
-                    EquipmentSlot slot = slotStackPair.getKey();
-                    ItemStack stack = slotStackPair.getValue();
+                for(EquipmentSlot slot : EquipmentSlot.values()) {
+                    ItemStack stack = attackerLiving.getEquipment(slot);
                     if(!stack.isAir()) {
                         // Sum damage from attribute
                         for(ItemAttribute attribute : stack.getMeta().getAttributes()) {
@@ -50,12 +42,14 @@ public class DamageProcessor {
                             if (slot.equals(EquipmentSlot.fromAttributeSlot(attribute.getSlot()))
                                     && attribute.getAttribute().equals(Attribute.ATTACK_DAMAGE)) {
 
-                                // Attribute operations aren't taken into consideration
+                                //TODO: Attribute operations aren't taken into consideration
                                 totalDamage += attribute.getValue();
                             }
                             if(slot == EquipmentSlot.MAIN_HAND) {
                                 short fireAspect = stack.getMeta().getEnchantmentMap().getOrDefault(Enchantment.FIRE_ASPECT, (short) 0);
-                                targetLiving.setFireForDuration(4*fireAspect, ChronoUnit.SECONDS);
+                                if(fireAspect > 0) {
+                                    targetLiving.setFireForDuration(4*fireAspect, ChronoUnit.SECONDS);
+                                }
                             }
                         }
                     }

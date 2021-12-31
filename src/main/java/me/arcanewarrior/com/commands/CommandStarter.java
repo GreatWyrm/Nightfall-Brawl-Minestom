@@ -16,6 +16,7 @@ public class CommandStarter {
         manager.register(new GamemodeCommand());
         manager.register(new ItemCommand());
         manager.register(new SummonCommand());
+        manager.register(new ActionItemCommand());
 
         LOGGER.debug("Finished Initializing Commands.");
     }

@@ -6,7 +6,6 @@ import net.minestom.server.command.builder.arguments.ArgumentString;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.ArgumentWord;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
-import net.minestom.server.command.builder.arguments.minecraft.ArgumentIntRange;
 import net.minestom.server.command.builder.arguments.number.ArgumentInteger;
 import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import net.minestom.server.entity.Entity;

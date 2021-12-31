@@ -46,7 +46,7 @@ public class GameCore {
         });
 
 
-        MinecraftServer.getGlobalEventHandler().addListener(ServerListPingEvent.class, serverListPingEvent -> serverListPingEvent.setResponseData(ServerConfig.getServerResponseData()));
+        globalEventHandler.addListener(ServerListPingEvent.class, serverListPingEvent -> serverListPingEvent.setResponseData(ServerConfig.getServerResponseData()));
 
         MainEventListener listener = new MainEventListener();
         listener.registerAllEvents();
