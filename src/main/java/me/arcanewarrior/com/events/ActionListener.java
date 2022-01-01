@@ -11,8 +11,18 @@ import net.minestom.server.event.trait.EntityEvent;
 
 public class ActionListener {
 
+    private final ActionPlayerManager parentManager;
+    private final GlobalEventHandler handler;
+
     public ActionListener(ActionPlayerManager parentManager, GlobalEventHandler handler) {
-        EventNode<EntityEvent> node = EventNode.type("action-input-events", EventFilter.ENTITY);
+       this.parentManager = parentManager;
+       this.handler = handler;
+    }
+
+    private final String eventNodeName = "action-input-events";
+
+    public void registerEvents() {
+        EventNode<EntityEvent> node = EventNode.type(eventNodeName, EventFilter.ENTITY);
         node.addListener(PlayerUseItemEvent.class, event -> {
             if(parentManager.isActionPlayer(event.getPlayer())) {
                 parentManager.getActionPlayer(event.getPlayer()).OnPlayerInput(ActionPlayer.InputType.RIGHT);
@@ -24,5 +34,9 @@ public class ActionListener {
             }
         });
         handler.addChild(node);
+    }
+
+    public void unregisterEvents() {
+        handler.removeChildren(eventNodeName);
     }
 }

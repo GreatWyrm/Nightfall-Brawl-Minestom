@@ -1,12 +1,16 @@
 package me.arcanewarrior.com.managers;
 
 import me.arcanewarrior.com.GameCore;
-import me.arcanewarrior.com.events.ActionListener;
 import me.arcanewarrior.com.action.ActionPlayer;
+import me.arcanewarrior.com.events.ActionListener;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ActionPlayerManager implements Manager {
 
@@ -14,12 +18,8 @@ public class ActionPlayerManager implements Manager {
 
     private final Map<UUID, ActionPlayer> actionPlayerList = new HashMap<>();
 
-    public Set<UUID> getListOfUUIDs() {
-        return actionPlayerList.keySet();
-    }
-
-    public List<String> getListOfNames() {
-        return actionPlayerList.values().stream().map(actionPlayer -> actionPlayer.getPlayer().getUsername()).toList();
+    public Set<String> getSetOfNames() {
+        return actionPlayerList.values().stream().map(actionPlayer -> actionPlayer.getPlayer().getUsername()).collect(Collectors.toSet());
     }
 
     public boolean isActionPlayer(Player player) {
@@ -38,16 +38,6 @@ public class ActionPlayerManager implements Manager {
         return actionPlayerList.get(uuid);
     }
 
-
-    public ActionPlayer getActionPlayer(String actionPlayerName) {
-        for(var entry : actionPlayerList.values()) {
-            if(entry.getPlayer().getUsername().equals(actionPlayerName)) {
-                return entry;
-            }
-        }
-        return null;
-    }
-
     public void addActionPlayer(Player player) {
         UUID id = player.getUuid();
         if(actionPlayerList.containsKey(id)) {
@@ -56,23 +46,21 @@ public class ActionPlayerManager implements Manager {
         actionPlayerList.put(id, new ActionPlayer(player));
     }
 
-    // TODO: Make the command use a player argument so we don't have to iterate
-    public void removeActionPlayer(String username) {
-        for(var entry : actionPlayerList.values()) {
-            if(entry.getPlayer().getUsername().equals(username)) {
-                actionPlayerList.remove(entry.getPlayer().getUuid());
-            }
-        }
+    public void removeActionPlayer(Player player) {
+        actionPlayerList.remove(player.getUuid());
     }
+
+    private ActionListener listener;
 
     @Override
     public void initialize() {
-        ActionListener listener = new ActionListener(this, MinecraftServer.getGlobalEventHandler());
+        listener = new ActionListener(this, MinecraftServer.getGlobalEventHandler());
+        listener.registerEvents();
     }
 
     @Override
     public void stop() {
-
+        listener.unregisterEvents();
     }
 
 }

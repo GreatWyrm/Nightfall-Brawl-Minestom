@@ -1,13 +1,17 @@
 package me.arcanewarrior.com.commands;
 
-import me.arcanewarrior.com.action.ActionPlayer;
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.managers.ActionPlayerManager;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.ArgumentWord;
+import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
+import net.minestom.server.command.builder.suggestion.SuggestionEntry;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.Player;
 
+import java.util.List;
 import java.util.Locale;
 
 public class ActionItemCommand extends Command {
@@ -16,15 +20,29 @@ public class ActionItemCommand extends Command {
 
         ArgumentWord modeArg = ArgumentType.Word("mode").from("give", "take");
         ArgumentEnum<ActionItemType> nameArg = ArgumentType.Enum("name", ActionItemType.class);
-        ArgumentWord actionPlayer = ArgumentType.Word("actionplayers").from(ActionPlayerManager.getManager().getListOfNames().toArray(new String[0]));
+        ArgumentEntity actionPlayer = ArgumentType.Entity("players").onlyPlayers(true);
+
+        actionPlayer.setSuggestionCallback((sender, context, suggestion) -> {
+            for(String name : ActionPlayerManager.getManager().getSetOfNames()) {
+                suggestion.addEntry(new SuggestionEntry(name));
+            }
+        });
 
         addSyntax((sender, context) -> {
             ActionItemType itemName = context.get(nameArg);
-            String actionPlayerName = context.get(actionPlayer);
-            ActionPlayer actPlayer = ActionPlayerManager.getManager().getActionPlayer(actionPlayerName);
+            List<Entity> allEntites = context.get(actionPlayer).find(sender);
+            List<Entity> actionPlayers = allEntites.stream().filter(entity -> entity instanceof Player player && ActionPlayerManager.getManager().isActionPlayer(player)).toList();
             switch (context.get(modeArg).toLowerCase(Locale.ROOT)) {
-                case "give" -> actPlayer.giveActionItemType(itemName);
-                case "take" -> actPlayer.removeActionItemType(itemName);
+                case "give" -> {
+                    for (Entity entity : actionPlayers) {
+                        ActionPlayerManager.getManager().getActionPlayer(entity.getUuid()).giveActionItemType(itemName);
+                    }
+                }
+                case "take" -> {
+                    for (Entity entity : actionPlayers) {
+                        ActionPlayerManager.getManager().getActionPlayer(entity.getUuid()).removeActionItemType(itemName);
+                    }
+                }
             }
         }, modeArg, nameArg, actionPlayer);
     }
