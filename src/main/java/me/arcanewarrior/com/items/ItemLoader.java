@@ -172,8 +172,7 @@ public class ItemLoader {
 
         return ItemStack.builder(baseMaterial)
                 .displayName(Component.text(itemName,
-                        Style.style(formatStyle.getNameColor(), TextDecoration.ITALIC.as(false), TextDecoration.OBFUSCATED.as(false),
-                                TextDecoration.BOLD.as(false), TextDecoration.STRIKETHROUGH.as(false), TextDecoration.UNDERLINED.as(false))))
+                        Style.style(formatStyle.getNameColor(), TextDecoration.ITALIC.as(false))))
                 .meta(itemMetaBuilder -> itemMetaBuilder
                         .hideFlag(
                                 //ItemHideFlag.HIDE_ATTRIBUTES,

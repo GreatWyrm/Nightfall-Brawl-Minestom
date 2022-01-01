@@ -26,6 +26,7 @@
   },
   "nyneve": {
     "material": "diamond_sword",
-    "name": "Nyneve"
+    "name": "Nyneve",
+    "lore": "Arcane's First Action Item"
   }
 }

@@ -18,7 +18,7 @@ public class ItemCommand extends Command {
         super("item");
         // TODO: Better feedback on command failure/success
 
-        ArgumentWord modeArg = ArgumentType.Word("mode").from("give");
+        ArgumentWord modeArg = ArgumentType.Word("mode").from("give", "examine");
         ArgumentString nameArg = ArgumentType.String("name");
         ArgumentInteger stackNum = ArgumentType.Integer("amount");
         stackNum.setDefaultValue(1);
@@ -26,9 +26,19 @@ public class ItemCommand extends Command {
 
         nameArg.setSuggestionCallback((sender, context, suggestion) -> ItemManager.getManager().getAllItemNames().forEach((itemName) -> suggestion.addEntry(new SuggestionEntry(itemName))));
 
-        setDefaultExecutor(((sender, context) -> sender.sendMessage("Usage: /item [give] [amount] <name>")));
+        setDefaultExecutor((sender, context) -> sender.sendMessage("Usage: /item [give] [amount] <name>"));
 
-        addSyntax(((sender, context) -> {
+        addSyntax((sender, context) -> {
+            if("examine".equalsIgnoreCase(context.get(modeArg))) {
+                if (sender instanceof Player player) {
+                    player.sendMessage("Item Details: " + player.getItemInMainHand());
+                } else {
+                    sender.sendMessage("Console cannot use this command!");
+                }
+            }
+        }, modeArg);
+
+        addSyntax((sender, context) -> {
             if ("give".equalsIgnoreCase(context.get(modeArg))) {
                 if (sender instanceof Player player) {
                     ItemManager.getManager().giveItemToPlayer(context.get(nameArg), context.get(stackNum), player);
@@ -38,9 +48,9 @@ public class ItemCommand extends Command {
             } else {
                 sender.sendMessage("Unknown Mode " + context.get(modeArg));
             }
-        }), modeArg, nameArg, stackNum);
+        }, modeArg, nameArg, stackNum);
 
-        addSyntax(((sender, context) -> {
+        addSyntax((sender, context) -> {
             if ("give".equalsIgnoreCase(context.get(modeArg))) {
                 List<Entity> entityList = context.get(playerArg).find(sender);
                 entityList.forEach(entity -> {
@@ -51,6 +61,6 @@ public class ItemCommand extends Command {
             } else {
                 sender.sendMessage("Unknown Mode " + context.get(modeArg));
             }
-        }), modeArg, nameArg, stackNum, playerArg);
+        }, modeArg, nameArg, stackNum, playerArg);
     }
 }
