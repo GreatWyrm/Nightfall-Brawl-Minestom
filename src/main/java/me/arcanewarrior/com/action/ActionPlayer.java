@@ -1,6 +1,9 @@
-package me.arcanewarrior.com.actionitems;
+package me.arcanewarrior.com.action;
 
+import me.arcanewarrior.com.action.items.ActionItemType;
+import me.arcanewarrior.com.action.items.BaseActionItem;
 import net.minestom.server.entity.Player;
+import net.minestom.server.item.ItemStack;
 
 /**
  * @author ArcaneWarrior
@@ -15,6 +18,24 @@ public class ActionPlayer {
     public ActionPlayer(Player player) {
         this.player = player;
         actionItemInventory = new ActionInventory(this);
+    }
+
+    // Inputs
+
+    public enum InputType {
+        LEFT,
+        RIGHT
+    }
+
+    public void OnPlayerInput(InputType type) {
+        ItemStack heldItem = player.getItemInMainHand();
+        BaseActionItem actionItem = actionItemInventory.getFromHeld(heldItem);
+        if(actionItem != null) {
+            switch (type) {
+                case LEFT -> actionItem.OnLeftClick();
+                case RIGHT -> actionItem.OnRightClick();
+            }
+        }
     }
 
     // ---- Action Inventory Manipulation ----

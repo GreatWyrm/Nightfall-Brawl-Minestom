@@ -1,7 +1,10 @@
-package me.arcanewarrior.com.actionitems;
+package me.arcanewarrior.com.action;
 
+import me.arcanewarrior.com.action.items.ActionItemType;
+import me.arcanewarrior.com.action.items.BaseActionItem;
 import net.minestom.server.inventory.TransactionOption;
 import net.minestom.server.inventory.TransactionType;
+import net.minestom.server.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,5 +38,14 @@ public class ActionInventory {
             player.getPlayer().getInventory().processItemStack(item.getBaseItem(), TransactionType.TAKE, TransactionOption.ALL_OR_NOTHING);
             return true;
         }
+    }
+
+    public BaseActionItem getFromHeld(ItemStack heldItem) {
+        for(BaseActionItem item : items.values()) {
+            if(item.doesItemMatch(heldItem)) {
+                return item;
+            }
+        }
+        return null;
     }
 }
