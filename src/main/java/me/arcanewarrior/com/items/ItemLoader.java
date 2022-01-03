@@ -1,7 +1,5 @@
 package me.arcanewarrior.com.items;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -15,14 +13,16 @@ import net.minestom.server.item.attribute.AttributeSlot;
 import net.minestom.server.item.attribute.ItemAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurateException;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class ItemLoader {
 
@@ -34,145 +34,106 @@ public class ItemLoader {
 
     public Map<String, ItemStack> loadAllItems(Path path) {
         if(Files.exists(path) && !Files.isDirectory(path)) {
-            try {
-                FileInputStream stream = new FileInputStream(path.toFile());
-                return loadAllItems(stream);
-            } catch (FileNotFoundException e) {
-                logger.warn("Failed to find file " + path);
-                e.printStackTrace();
-            }
+            return loadItemsFromPath(path);
         } else {
             throw new IllegalArgumentException("Could not find file " + path + ", or it is a directory!");
         }
-        logger.warn("Unknown error occurred while trying to load items.");
-        return new HashMap<>();
     }
 
-
-    public Map<String, ItemStack> loadAllItems(InputStream itemStream) {
-        ObjectMapper mapper = new ObjectMapper();
+    public Map<String, ItemStack> loadItemsFromPath(Path path) {
         Map<String, ItemStack> loadedItems = new HashMap<>();
+        final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
+                .path(path)
+                .indent(2)
+                .build();
         try {
-            JsonNode rootNode = mapper.readTree(itemStream);
-            Iterator<Map.Entry<String, JsonNode>> iterator = rootNode.fields();
-            while(iterator.hasNext()) {
-                Map.Entry<String, JsonNode> nextNode = iterator.next();
-                // Double try catch, I know, pretty bad, but this is to ensure it won't skip the rest of the file if it fails to load an item
-                try {
-                    ItemStack newItem = loadItem(nextNode.getValue());
-                    loadedItems.put(nextNode.getKey(), newItem);
-                } catch (IllegalArgumentException e) {
-                    logger.warn("Failed to load item: " + nextNode.getKey());
-                    e.printStackTrace();
-                }
+            CommentedConfigurationNode input = loader.load();
+            for(var child : input.childrenMap().entrySet()) {
+                ItemStack stack = createItemFromNode(child.getValue());
+                loadedItems.put(child.getKey().toString(), stack);
             }
-        } catch (IOException e) {
+        } catch (ConfigurateException e) {
+            logger.warn("Failed to load items in path: " + path.toString());
             e.printStackTrace();
         }
         return loadedItems;
     }
 
-    public ItemStack loadItem(JsonNode itemNode) throws IllegalArgumentException {
-        // Get material
-        JsonNode material = itemNode.get("material");
-        if(material == null) {
-            throw new IllegalArgumentException("Material is not defined!");
-        } else if(!material.isTextual()) {
-            throw new IllegalArgumentException("Material must be of type string!");
+    public ItemStack createItemFromNode(CommentedConfigurationNode node) {
+
+        CommentedConfigurationNode materialNode = node.node("material");
+        if(materialNode.isNull()) {
+            logger.warn("Material is not specified for item!");
         }
-        Material baseMaterial = Material.fromNamespaceId("minecraft:" + material.asText());
+        String materialName = materialNode.getString( "diamond");
+        Material baseMaterial = Material.fromNamespaceId("minecraft:"+materialName);
         if(baseMaterial == null) {
-            throw new IllegalArgumentException("Could not find material: " + material.asText() + "!");
+            throw new IllegalArgumentException("Could not find material: " + materialName + "!");
         }
 
-        JsonNode formatStyleJSON = itemNode.get("style");
-        ItemFormatStyle formatStyle = ItemFormatStyle.valueOf(formatStyleJSON == null ? "DEFAULT" : formatStyleJSON.asText("DEFAULT").toUpperCase());
+        CommentedConfigurationNode nameNode = node.node("name");
+        if(nameNode.isNull()) {
+            logger.warn("Name is not specified for item!");
+        }
+        String itemName = nameNode.getString("Error: No Name Specified");
 
-        JsonNode itemNameJSON = itemNode.get("name");
-        String ERROR_NAME = "Error: Name not Specified";
-        String itemName = itemNameJSON == null ? ERROR_NAME : itemNameJSON.asText(ERROR_NAME);
+        CommentedConfigurationNode styleNode = node.node("style");
+        String styleName = styleNode.getString("default").toUpperCase();
+        ItemFormatStyle formatStyle = ItemFormatStyle.valueOf(styleName);
 
-        JsonNode modelDataJson = itemNode.get("custommodeldata");
-        int modelData = modelDataJson == null ? 0 : modelDataJson.asInt(0);
+        CommentedConfigurationNode modelDataNode = node.node("custommodeldata");
+        int customModelData = modelDataNode.getInt(0);
 
         ArrayList<Component> lore = new ArrayList<>();
-        JsonNode loreNode = itemNode.get("lore");
-        if(loreNode != null && loreNode.isTextual()) {
-            // TODO: Apply variables to string
-            // Unfortunately, reading in a \n directly to a component just produces a line feed icon
-            String[] lines = loreNode.asText().split("\n");
-            for(String line : lines) {
+        CommentedConfigurationNode loreNode = node.node("lore");
+        String loreLines = loreNode.getString("default");
+        if (loreLines != null) {
+            for(String line : loreLines.split("\n")) {
                 lore.add(Component.text(line, Style.style(formatStyle.getLoreColor(), TextDecoration.ITALIC.as(false))));
             }
         }
 
         ArrayList<ItemAttribute> attributes = new ArrayList<>();
-        JsonNode attributeNode = itemNode.get("attributes");
-        if(attributeNode != null && attributeNode.isArray()) {
-            for (JsonNode attribute : attributeNode) {
-                if (attribute.isObject()) {
-                    // Get particular fields
-                    JsonNode attributeName = attribute.get("attribute");
-                    if (attributeName == null || !attributeName.isTextual()) {
-                        logger.warn("Error loading item, attribute field is missing or wrong value type!");
-                        continue;
-                    }
-                    JsonNode value = attribute.get("amount");
-                    if (value == null || !value.isNumber()) {
-                        logger.warn("Error loading item, amount field is missing or wrong value type!");
-                        continue;
-                    }
-                    // Optional
-                    JsonNode operationName = attribute.get("operation");
-                    JsonNode slotName = attribute.get("slot");
-
-                    Attribute actual = Attribute.fromKey("generic." + attributeName.asText().toLowerCase());
-                    if (actual == null) {
-                        logger.warn("Unknown attribute name: " + attributeName.asText());
-                        continue;
-                    }
-                    AttributeOperation operation = AttributeOperation.ADDITION;
-                    if (operationName != null) {
-                        if (operationName.isNumber()) {
-                            operation = AttributeOperation.fromId(operationName.asInt());
-                            if (operation == null) {
-                                logger.warn("Unknown attribute operation id: " + operationName.asInt());
-                                continue;
-                            }
-                        }
-                    }
-                    AttributeSlot slot = AttributeSlot.MAINHAND;
-                    if (slotName != null && slotName.isTextual()) {
-                        try {
-                            slot = AttributeSlot.valueOf(slotName.asText().toUpperCase());
-                        } catch (IllegalArgumentException e) {
-                            logger.warn("Unknown attribute slot name: " + slotName.asText());
-                            continue;
-                        }
-                    }
-                    var newAttribute = new ItemAttribute(UUID.randomUUID(), "name", actual, operation, value.asDouble(), slot);
-                    attributes.add(newAttribute);
-                }
+        CommentedConfigurationNode attributeNode = node.node("attributes");
+        for(var child : attributeNode.childrenList()) {
+            String attributeName = child.node("attribute").getString();
+            if(attributeName == null) {
+                logger.warn("Unable to read attribute name!");
+                continue;
             }
+            Attribute actual = Attribute.fromKey("generic." + attributeName.toLowerCase());
+            if (actual == null) {
+                logger.warn("Unknown attribute name: " + attributeName);
+                continue;
+            }
+            int operation = child.node("operation").getInt(0);
+            AttributeOperation attributeOperation = AttributeOperation.fromId(operation);
+            if (attributeOperation == null) {
+                logger.warn("Unknown attribute operation id: " + operation);
+                continue;
+            }
+            double amount = child.node("amount").getDouble(1);
+            AttributeSlot slot = AttributeSlot.valueOf(child.node("slot").getString("mainhand").toUpperCase());
+
+            var newAttribute = new ItemAttribute(UUID.randomUUID(), "name", actual, attributeOperation, amount, slot);
+            attributes.add(newAttribute);
         }
 
         HashMap<Enchantment, Short> enchantments = new HashMap<>();
-        JsonNode enchantmentsNode = itemNode.get("enchantments");
-        if(enchantmentsNode != null && enchantmentsNode.isObject()) {
-            for (Iterator<Map.Entry<String, JsonNode>> it = enchantmentsNode.fields(); it.hasNext(); ) {
-                Map.Entry<String, JsonNode> enchantment = it.next();
-                // String holds enchant name, JsonNode holds enchant value
-                var enchant = Enchantment.fromNamespaceId("minecraft:"+enchantment.getKey());
-                if(enchant != null &&
-                        enchantment.getValue() != null && enchantment.getValue().isNumber()) {
-                    enchantments.put(enchant, enchantment.getValue().shortValue());
-                }
+        CommentedConfigurationNode enchantmentsNode = node.node("enchantments");
+        for(var child : enchantmentsNode.childrenMap().entrySet()) {
+            Enchantment enchantment = Enchantment.fromNamespaceId("minecraft:"+child.getKey());
+            if(enchantment == null) {
+                logger.warn("Unknown enchantment " + child.getKey());
             }
+            short value = (short) child.getValue().getInt(0);
+            enchantments.put(enchantment, value);
         }
 
         return ItemStack.builder(baseMaterial)
                 .displayName(Component.text(itemName,
-                        Style.style(formatStyle.getNameColor(), TextDecoration.ITALIC.as(false))))
+                        Style.style(formatStyle.getNameColor(), TextDecoration.ITALIC.as(false)))
+                )
                 .meta(itemMetaBuilder -> itemMetaBuilder
                         .hideFlag(
                                 //ItemHideFlag.HIDE_ATTRIBUTES,
@@ -181,7 +142,7 @@ public class ItemLoader {
                         )
                         .attributes(attributes)
                         .enchantments(enchantments)
-                        .customModelData(modelData)
+                        .customModelData(customModelData)
                         .unbreakable(true)
                         .lore(lore)
                 )

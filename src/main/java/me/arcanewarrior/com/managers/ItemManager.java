@@ -22,7 +22,7 @@ public class ItemManager implements Manager {
     @Override
     public void initialize() {
         ItemLoader itemLoader = new ItemLoader();
-        itemList.putAll(itemLoader.loadAllItems(Paths.get("test.json")));
+        itemList.putAll(itemLoader.loadAllItems(Paths.get("test.yml")));
     }
 
     public Set<String> getAllItemNames() {

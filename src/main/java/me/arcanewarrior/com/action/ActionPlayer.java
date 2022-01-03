@@ -2,6 +2,7 @@ package me.arcanewarrior.com.action;
 
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.action.items.BaseActionItem;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;
 
@@ -18,6 +19,13 @@ public class ActionPlayer {
     public ActionPlayer(Player player) {
         this.player = player;
         actionItemInventory = new ActionInventory(this);
+    }
+
+    // Movement
+
+    public void dashTowardsFacing(double multiplier) {
+        Vec direction = player.getPosition().direction();
+        player.setVelocity(direction.mul(multiplier));
     }
 
     // Inputs

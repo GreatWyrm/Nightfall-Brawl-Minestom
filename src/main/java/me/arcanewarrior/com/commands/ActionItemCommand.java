@@ -30,6 +30,22 @@ public class ActionItemCommand extends Command {
 
         addSyntax((sender, context) -> {
             ActionItemType itemName = context.get(nameArg);
+            if(sender instanceof Player player) {
+                if(ActionPlayerManager.getManager().isActionPlayer(player)) {
+                    switch (context.get(modeArg).toLowerCase(Locale.ROOT)) {
+                        case "give" -> ActionPlayerManager.getManager().getActionPlayer(player).giveActionItemType(itemName);
+                        case "take" -> ActionPlayerManager.getManager().getActionPlayer(player).removeActionItemType(itemName);
+                    }
+                } else {
+                    sender.sendMessage("You are not an action player!");
+                }
+            } else {
+                sender.sendMessage("Console cannot use this command!");
+            }
+        }, modeArg, nameArg);
+
+        addSyntax((sender, context) -> {
+            ActionItemType itemName = context.get(nameArg);
             List<Entity> allEntites = context.get(actionPlayer).find(sender);
             List<Entity> actionPlayers = allEntites.stream().filter(entity -> entity instanceof Player player && ActionPlayerManager.getManager().isActionPlayer(player)).toList();
             switch (context.get(modeArg).toLowerCase(Locale.ROOT)) {

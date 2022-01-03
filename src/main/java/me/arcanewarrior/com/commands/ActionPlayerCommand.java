@@ -40,6 +40,7 @@ public class ActionPlayerCommand extends Command {
                     for(var arg : context.get(player).find(sender)) {
                         if(arg instanceof Player p && !ActionPlayerManager.getManager().isActionPlayer(p)) {
                             ActionPlayerManager.getManager().addActionPlayer(p);
+                            sender.sendMessage("Added " + p.getUsername() + " as an Action Player");
                         }
                     }
                 }
@@ -47,6 +48,7 @@ public class ActionPlayerCommand extends Command {
                     for(var arg : context.get(player).find(sender)) {
                         if(arg instanceof Player p && ActionPlayerManager.getManager().isActionPlayer(p)) {
                             ActionPlayerManager.getManager().removeActionPlayer(p);
+                            sender.sendMessage("Removed " + p.getUsername() + " as an Action Player");
                         }
                     }
                 }
