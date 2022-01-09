@@ -40,7 +40,7 @@ public class ItemLoader {
         }
     }
 
-    public Map<String, ItemStack> loadItemsFromPath(Path path) {
+    private Map<String, ItemStack> loadItemsFromPath(Path path) {
         Map<String, ItemStack> loadedItems = new HashMap<>();
         final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
                 .path(path)
@@ -49,6 +49,7 @@ public class ItemLoader {
         try {
             CommentedConfigurationNode input = loader.load();
             for(var child : input.childrenMap().entrySet()) {
+                System.out.println("Getting item: " + child.getKey());
                 ItemStack stack = createItemFromNode(child.getValue());
                 loadedItems.put(child.getKey().toString(), stack);
             }
@@ -59,7 +60,7 @@ public class ItemLoader {
         return loadedItems;
     }
 
-    public ItemStack createItemFromNode(CommentedConfigurationNode node) {
+    private ItemStack createItemFromNode(CommentedConfigurationNode node) {
 
         CommentedConfigurationNode materialNode = node.node("material");
         if(materialNode.isNull()) {

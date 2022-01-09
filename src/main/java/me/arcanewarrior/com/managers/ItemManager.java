@@ -8,6 +8,9 @@ import net.minestom.server.inventory.TransactionType;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +24,27 @@ public class ItemManager implements Manager {
 
     @Override
     public void initialize() {
+        loadItemsFromItemFolder();
+    }
+
+    public void reloadItems() {
+        itemList.clear();
+        loadItemsFromItemFolder();
+    }
+
+    private void loadItemsFromItemFolder() {
         ItemLoader itemLoader = new ItemLoader();
-        itemList.putAll(itemLoader.loadAllItems(Paths.get("test.yml")));
+        Path itemFolder = Paths.get("items");
+        if(Files.exists(itemFolder) && Files.isDirectory(itemFolder)) {
+            try {
+                Files.list(itemFolder).forEach(path -> {
+                    System.out.println("Searching path: " + path.toString());
+                    itemList.putAll(itemLoader.loadAllItems(path));
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public Set<String> getAllItemNames() {

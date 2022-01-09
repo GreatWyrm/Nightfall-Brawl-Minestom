@@ -19,7 +19,7 @@ public class ActionItemCommand extends Command {
         super("actionitem", "acti");
 
         ArgumentWord modeArg = ArgumentType.Word("mode").from("give", "take");
-        ArgumentEnum<ActionItemType> nameArg = ArgumentType.Enum("name", ActionItemType.class);
+        ArgumentEnum<ActionItemType> nameArg = ArgumentType.Enum("name", ActionItemType.class).setFormat(ArgumentEnum.Format.LOWER_CASED);
         ArgumentEntity actionPlayer = ArgumentType.Entity("players").onlyPlayers(true);
 
         actionPlayer.setSuggestionCallback((sender, context, suggestion) -> {

@@ -18,7 +18,7 @@ public class ItemCommand extends Command {
         super("item");
         // TODO: Better feedback on command failure/success
 
-        ArgumentWord modeArg = ArgumentType.Word("mode").from("give", "examine");
+        ArgumentWord modeArg = ArgumentType.Word("mode").from("give", "examine", "reload");
         ArgumentString nameArg = ArgumentType.String("name");
         ArgumentInteger stackNum = ArgumentType.Integer("amount");
         stackNum.setDefaultValue(1);
@@ -35,6 +35,9 @@ public class ItemCommand extends Command {
                 } else {
                     sender.sendMessage("Console cannot use this command!");
                 }
+            } else if("reload".equalsIgnoreCase(context.get(modeArg))) {
+                ItemManager.getManager().reloadItems();
+                sender.sendMessage("Reloaded Item Pool");
             }
         }, modeArg);
 
@@ -46,7 +49,7 @@ public class ItemCommand extends Command {
                     sender.sendMessage("Console cannot use this command!");
                 }
             } else {
-                sender.sendMessage("Unknown Mode " + context.get(modeArg));
+                sender.sendMessage("Invalid Mode " + context.get(modeArg));
             }
         }, modeArg, nameArg, stackNum);
 
@@ -59,7 +62,7 @@ public class ItemCommand extends Command {
                     }
                 });
             } else {
-                sender.sendMessage("Unknown Mode " + context.get(modeArg));
+                sender.sendMessage("Invalid Mode " + context.get(modeArg));
             }
         }, modeArg, nameArg, stackNum, playerArg);
     }

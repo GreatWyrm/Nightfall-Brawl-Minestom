@@ -24,8 +24,6 @@ public class BowMechanics {
      */
     public void handleBowUpdateState(@NotNull ItemUpdateStateEvent event) {
         Player player = event.getPlayer();
-
-
         double power;
         double defaultSpread = 1d;
         if(bowFirstDrawn.containsKey(player.getUuid())) {

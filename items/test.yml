@@ -4,7 +4,8 @@ shiny:
   attributes:
     - attribute: "attack_damage"
       amount: 15
-  lore: "When Arcane first created the world,\nhe made a thing. This is that thing."
+  lore: "When Arcane first created the world,\n
+         he made a thing. This is that thing."
   enchantments:
     sharpness: 5
     fire_aspect: 2
@@ -13,6 +14,11 @@ yllanter:
   material: "bow"
   name: "Yllanter"
   lore: "The first bow"
+
+strong-dirt:
+  material: "stone"
+  name: Dwarven Stone
+  lore: "For building boxes"
 
 galvan:
   material: "arrow"

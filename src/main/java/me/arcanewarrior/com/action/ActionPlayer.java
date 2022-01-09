@@ -5,6 +5,8 @@ import me.arcanewarrior.com.action.items.BaseActionItem;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ArcaneWarrior
@@ -12,6 +14,8 @@ import net.minestom.server.item.ItemStack;
  * and allow them to use ActionItems
  */
 public class ActionPlayer {
+
+    private static final Logger logger = LoggerFactory.getLogger(ActionPlayer.class);
 
     private final Player player;
     private final ActionInventory actionItemInventory;
@@ -24,6 +28,9 @@ public class ActionPlayer {
     // Movement
 
     public void dashTowardsFacing(double multiplier) {
+        if(multiplier > 80) {
+            logger.warn("Velocity Multiplier over 80! This may cause weird behavior!");
+        }
         Vec direction = player.getPosition().direction();
         player.setVelocity(direction.mul(multiplier));
     }
