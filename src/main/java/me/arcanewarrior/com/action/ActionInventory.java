@@ -48,4 +48,10 @@ public class ActionInventory {
         }
         return null;
     }
+
+    public void update() {
+        for(BaseActionItem item : items.values()) {
+            item.update();
+        }
+    }
 }

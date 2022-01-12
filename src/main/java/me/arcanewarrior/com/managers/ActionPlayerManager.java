@@ -5,6 +5,8 @@ import me.arcanewarrior.com.action.ActionPlayer;
 import me.arcanewarrior.com.events.ActionListener;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,11 +58,21 @@ public class ActionPlayerManager implements Manager {
     public void initialize() {
         listener = new ActionListener(this, MinecraftServer.getGlobalEventHandler());
         listener.registerEvents();
+        updateActionPlayersTask = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            for(ActionPlayer player : actionPlayerList.values()) {
+                player.update();
+            }
+        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+        // Above, start immediately, run once per tick
+
     }
 
     @Override
     public void stop() {
         listener.unregisterEvents();
+        updateActionPlayersTask.cancel();
     }
 
+
+    private Task updateActionPlayersTask;
 }

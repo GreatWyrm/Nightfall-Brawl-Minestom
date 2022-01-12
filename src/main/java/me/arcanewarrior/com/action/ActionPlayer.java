@@ -1,8 +1,10 @@
 package me.arcanewarrior.com.action;
 
 import me.arcanewarrior.com.action.items.ActionItemType;
+import me.arcanewarrior.com.action.items.BaseActionBow;
 import me.arcanewarrior.com.action.items.BaseActionItem;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.ItemStack;
 import org.slf4j.Logger;
@@ -23,6 +25,37 @@ public class ActionPlayer {
     public ActionPlayer(Player player) {
         this.player = player;
         actionItemInventory = new ActionInventory(this);
+    }
+
+    // Updating/Ticking
+
+    public void update() {
+        actionItemInventory.update();
+    }
+
+    // Bow Stuff
+
+    public void OnStartDrawing(long currentTime) {
+        ItemStack heldItem = player.getItemInMainHand();
+        BaseActionItem actionItem = actionItemInventory.getFromHeld(heldItem);
+        if(actionItem instanceof BaseActionBow actionBow) {
+            actionBow.setBowStartDrawing(currentTime);
+        }
+    }
+
+    /**
+     * Called when the player fires their bow
+     * @param projectile The projectile they are shooting
+     * @param power The power of the projectile, ranges from 0 to 3
+     * @return The new entity to fire from this bow, and null if this shouldn't fire anything
+     */
+    public boolean OnBowFire(Entity projectile, double power) {
+        ItemStack heldItem = player.getItemInMainHand();
+        BaseActionItem actionItem = actionItemInventory.getFromHeld(heldItem);
+        if(actionItem instanceof BaseActionBow actionBow) {
+            return actionBow.OnBowFire(projectile, power);
+        }
+        return false;
     }
 
     // Movement

@@ -9,7 +9,6 @@ import net.minestom.server.world.biomes.BiomeEffects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class VoidChunkGenerator implements ChunkGenerator {
@@ -34,11 +33,6 @@ public class VoidChunkGenerator implements ChunkGenerator {
     @Override
     public void generateChunkData(@NotNull ChunkBatch batch, int chunkX, int chunkZ) {
 
-    }
-
-    @Override
-    public void fillBiomes(@NotNull Biome[] biomes, int chunkX, int chunkZ) {
-        Arrays.fill(biomes, VOID);
     }
 
     @Override

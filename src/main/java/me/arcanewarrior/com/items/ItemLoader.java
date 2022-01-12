@@ -49,7 +49,6 @@ public class ItemLoader {
         try {
             CommentedConfigurationNode input = loader.load();
             for(var child : input.childrenMap().entrySet()) {
-                System.out.println("Getting item: " + child.getKey());
                 ItemStack stack = createItemFromNode(child.getValue());
                 loadedItems.put(child.getKey().toString(), stack);
             }

@@ -37,10 +37,7 @@ public class ItemManager implements Manager {
         Path itemFolder = Paths.get("items");
         if(Files.exists(itemFolder) && Files.isDirectory(itemFolder)) {
             try {
-                Files.list(itemFolder).forEach(path -> {
-                    System.out.println("Searching path: " + path.toString());
-                    itemList.putAll(itemLoader.loadAllItems(path));
-                });
+                Files.list(itemFolder).forEach(path -> itemList.putAll(itemLoader.loadAllItems(path)));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -72,7 +69,7 @@ public class ItemManager implements Manager {
      */
     public boolean giveItemToPlayer(String name, int amount, Player player) {
         ItemStack stack = getItem(name, amount);
-        return player.getInventory().processItemStack(stack, TransactionType.ADD, TransactionOption.ALL_OR_NOTHING);
+        return player.getInventory().addItemStack(stack);
     }
 
     /**

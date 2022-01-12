@@ -8,7 +8,10 @@ import java.util.function.Function;
 public enum ActionItemType {
 
 
-    NYNEVE(Nyneve::new);
+    NYNEVE(Nyneve::new),
+    PYRRHIC(Pyrrhic::new)
+
+    ;
 
 
     private final Function<ActionPlayer, BaseActionItem> actionItemCreator;

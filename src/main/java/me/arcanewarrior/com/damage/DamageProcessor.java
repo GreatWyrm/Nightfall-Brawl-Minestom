@@ -39,11 +39,11 @@ public class DamageProcessor {
                         // Sum damage from attribute
                         for(ItemAttribute attribute : stack.getMeta().getAttributes()) {
                             // If slots match and the attribute is attack damage
-                            if (slot.equals(EquipmentSlot.fromAttributeSlot(attribute.getSlot()))
-                                    && attribute.getAttribute().equals(Attribute.ATTACK_DAMAGE)) {
+                            if (slot.equals(EquipmentSlot.fromAttributeSlot(attribute.slot()))
+                                    && attribute.attribute().equals(Attribute.ATTACK_DAMAGE)) {
 
                                 //TODO: Attribute operations aren't taken into consideration
-                                totalDamage += attribute.getValue();
+                                totalDamage += attribute.amount();
                             }
                             if(slot == EquipmentSlot.MAIN_HAND) {
                                 short fireAspect = stack.getMeta().getEnchantmentMap().getOrDefault(Enchantment.FIRE_ASPECT, (short) 0);

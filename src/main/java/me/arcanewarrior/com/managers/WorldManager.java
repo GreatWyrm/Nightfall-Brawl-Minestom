@@ -9,12 +9,15 @@ import net.minestom.server.instance.*;
 import net.minestom.server.instance.batch.ChunkBatch;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.tag.Tag;
-import net.minestom.server.world.biomes.Biome;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jglrxavpok.hephaistos.nbt.NBTCompound;
+import org.jglrxavpok.hephaistos.nbt.mutable.MutableNBTCompound;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class WorldManager implements Manager {
 
@@ -83,12 +86,12 @@ public class WorldManager implements Manager {
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
         instanceContainer.setChunkGenerator(new BasicChunkGenerator());
         // Set NBT Tag for proper teleporting
-        NBTCompound data = new NBTCompound();
+        MutableNBTCompound data = new MutableNBTCompound();
         data.setInt("SpawnX", 0);
         data.setInt("SpawnY", 42);
         data.setInt("SpawnZ", 0);
         NBTCompound parent = new NBTCompound();
-        parent.set("Data", data);
+        parent.plus(data);
         instanceContainer.setTag(Tag.NBT,parent);
         worldList.put(DEFAULT_WORLD_NAME, instanceContainer);
     }
@@ -110,7 +113,7 @@ public class WorldManager implements Manager {
                 unloadMinecraftWorld(worldName, false);
             }
         }
-        //getDefaultWorld().saveChunksToStorage();
+        getDefaultWorld().saveChunksToStorage();
     }
 
     private static class BasicChunkGenerator implements ChunkGenerator {
@@ -130,11 +133,6 @@ public class WorldManager implements Manager {
                     }
                 }
             }
-        }
-
-        @Override
-        public void fillBiomes(@NotNull Biome[] biomes, int chunkX, int chunkZ) {
-            Arrays.fill(biomes, Biome.PLAINS);
         }
 
         @Override

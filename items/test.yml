@@ -28,3 +28,8 @@ nyneve:
   material: "diamond_sword"
   name: Nyneve
   lore: "Arcane's First Action Item"
+
+pyrrhic:
+  material: "bow"
+  name: Pyrrhic
+  lore: "The Action Bow"
