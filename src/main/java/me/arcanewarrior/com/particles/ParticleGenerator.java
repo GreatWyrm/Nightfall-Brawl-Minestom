@@ -33,7 +33,7 @@ public class ParticleGenerator {
                 offsetZ,
                 particleData,
                 count,
-                extraData == null ? null : binaryWriter -> binaryWriter.write(extraData)
+                extraData == null ? null : binaryWriter -> binaryWriter.setBuffer(extraData.getBuffer())
         );
     }
 

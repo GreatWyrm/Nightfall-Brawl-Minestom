@@ -17,7 +17,7 @@ public class CommandStarter {
         manager.register(new ItemCommand());
         manager.register(new SummonCommand());
         manager.register(new ActionItemCommand());
-        manager.register(new ActionPlayerCommand());
+        manager.register(new BrawlGameCommand());
 
         LOGGER.debug("Finished Initializing Commands.");
     }

@@ -19,8 +19,8 @@ public class ActionPlayer {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionPlayer.class);
 
-    private final Player player;
-    private final ActionInventory actionItemInventory;
+    protected final Player player;
+    protected final ActionInventory actionItemInventory;
 
     public ActionPlayer(Player player) {
         this.player = player;
@@ -57,6 +57,10 @@ public class ActionPlayer {
         }
         return false;
     }
+
+    // Damage
+
+
 
     // Movement
 

@@ -7,7 +7,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author ArcaneWarrior
