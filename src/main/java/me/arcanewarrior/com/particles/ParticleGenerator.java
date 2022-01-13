@@ -65,6 +65,29 @@ public class ParticleGenerator {
     }
 
     /**
+     * Used for Particle.Dust_Color_Transition
+     * @param fromRed Start red value, from 0-1
+     * @param fromGreen start green value, from 0-1
+     * @param fromBlue start blue value, from 0-1
+     * @param size Size Value, from 0.01-4
+     * @param toRed End red value, from 0-1
+     * @param toGreen End green Value, from 0-1
+     * @param toBlue End blue value, from 0-1
+     * @return BinaryWriter containing the data
+     */
+    public static BinaryWriter createDustTransitionData(float fromRed, float fromGreen, float fromBlue, float size, float toRed, float toGreen, float toBlue) {
+        BinaryWriter writer = new BinaryWriter();
+        writer.writeFloat(fromRed);
+        writer.writeFloat(fromGreen);
+        writer.writeFloat(fromBlue);
+        writer.writeFloat(size);
+        writer.writeFloat(toRed);
+        writer.writeFloat(toGreen);
+        writer.writeFloat(toBlue);
+        return writer;
+    }
+
+    /**
      * Used for Particle.Block, Particle.Block_Marker, Particle.Falling_Dust
      * @param block - The block particle to use
      * @return A BinaryWriter containing the data

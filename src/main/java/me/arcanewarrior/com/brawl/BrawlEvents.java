@@ -5,11 +5,9 @@ import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
-import net.minestom.server.event.player.PlayerStopFlyingEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityEvent;
 
@@ -67,7 +65,6 @@ public class BrawlEvents {
                 damage.fire();
             }
         });
-        //node.addListener(PlayerStopFlyingEvent.class, event -> event.getPlayer().setFlying(true));
         eventHandler.addChild(node);
     }
 

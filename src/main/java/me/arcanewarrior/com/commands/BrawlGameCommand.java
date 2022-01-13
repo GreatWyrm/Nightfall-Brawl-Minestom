@@ -46,6 +46,7 @@ public class BrawlGameCommand extends Command {
                 for(Player player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
                     gameCore.addBrawlPlayer(player);
                 }
+                gameCore.warpPlayersToCenter();
             }
         }, modeArg);
 

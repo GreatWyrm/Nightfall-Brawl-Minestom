@@ -73,7 +73,7 @@ public class GameCore {
     // ------ BRAWL GAME DELEGATION ------
     // Safely wraps around the brawl game, performing null checks
     public void createNewBrawlGame() {
-        currentBrawlGame = new BrawlGame();
+        currentBrawlGame = new BrawlGame(WorldManager.getManager().getDefaultWorld());
     }
 
     public void endBrawlGame() {
@@ -134,4 +134,9 @@ public class GameCore {
         }
     }
 
+    public void warpPlayersToCenter() {
+        if(currentBrawlGame != null) {
+            currentBrawlGame.warpAllToCenter();
+        }
+    }
 }

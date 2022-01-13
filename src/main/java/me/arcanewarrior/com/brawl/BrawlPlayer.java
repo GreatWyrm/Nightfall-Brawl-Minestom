@@ -15,8 +15,6 @@ public class BrawlPlayer extends ActionPlayer {
     public BrawlPlayer(Player player, BrawlGame parent) {
         super(player);
         parentGame = parent;
-        player.setGravity(0.01, 0.9);
-        player.setFlying(true);
     }
 
     // Random offset, so we aren't updating a bunch of players on the same tick
