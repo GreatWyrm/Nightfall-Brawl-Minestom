@@ -20,9 +20,6 @@ public class MainEventListener {
         DamageProcessor processer = new DamageProcessor();
         BowMechanics bowMechanics = new BowMechanics();
         EventNode<EntityEvent> node = EventNode.type("damage-events", EventFilter.ENTITY);
-        node.addListener(EventListener.builder(EntityDamageEvent.class)
-                .handler(processer::handleEntityDamage)
-                .build());
         node.addListener(EventListener.builder(EntityAttackEvent.class)
                 .handler(processer::processEntityAttackEvent)
                 .build());

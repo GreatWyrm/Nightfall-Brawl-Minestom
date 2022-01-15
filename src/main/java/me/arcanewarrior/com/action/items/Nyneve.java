@@ -15,7 +15,6 @@ public class Nyneve extends BaseActionItem {
     }
     @Override
     public void OnLeftClick() {
-        Pos pos = player.getPlayer().getPosition();
         ParticleGenerator.spawnParticlesForAll(player.getPlayer(), Particle.DUST, player.getPlayer().getPosition(), false,
                 1f, 1f, 1f, 1f, 20, ParticleGenerator.createDustData(0.8f, 1f, 1f, 2f));
     }
@@ -23,7 +22,7 @@ public class Nyneve extends BaseActionItem {
     @Override
     public void OnRightClick() {
         // Dash towards facing direction
-        player.dashTowardsFacing(75);
+        player.dashTowardsFacing(40);
         player.getPlayer().playSound(Sound.sound(Key.key("entity.pillager.celebrate"), Sound.Source.AMBIENT, 0.3f, 1f), Sound.Emitter.self());
     }
 

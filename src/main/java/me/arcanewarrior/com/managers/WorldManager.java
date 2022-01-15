@@ -123,7 +123,9 @@ public class WorldManager implements Manager {
             for(byte x = 0; x < Chunk.CHUNK_SIZE_X; x++) {
                 for(byte y = 0; y < 40; y++) {
                     for(byte z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
-                        if(x % 8 == 0) {
+                        if((x + z) % 7 == 0) {
+                            batch.setBlock(x, y, z, Block.HAY_BLOCK);
+                        } else if(x % 8 == 0) {
                             batch.setBlock(x, y, z, Block.AMETHYST_BLOCK);
                         } else if(x % 4 == 0) {
                             batch.setBlock(x, y, z, Block.BONE_BLOCK);

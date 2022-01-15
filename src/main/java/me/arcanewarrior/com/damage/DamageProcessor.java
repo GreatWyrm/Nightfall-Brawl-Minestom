@@ -18,13 +18,6 @@ import java.time.temporal.ChronoUnit;
 
 public class DamageProcessor {
 
-
-    public void handleEntityDamage(@NotNull EntityDamageEvent event) {
-        System.out.println("Entity damage event was called");
-        System.out.println("DamageType: " + event.getDamageType());
-        System.out.println("Damage Amount: " + event.getDamage());
-    }
-
     public void processEntityAttackEvent(@NotNull EntityAttackEvent event) {
         Entity attacker = event.getEntity();
         Entity attackee = event.getTarget();

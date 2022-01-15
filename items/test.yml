@@ -27,6 +27,9 @@ galvan:
 nyneve:
   material: "diamond_sword"
   name: Nyneve
+  attributes:
+    - attribute: "attack_damage"
+      amount: 15
   lore: "Arcane's First Action Item"
 
 pyrrhic:

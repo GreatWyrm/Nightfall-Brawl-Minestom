@@ -2,6 +2,8 @@ package me.arcanewarrior.com.brawl;
 
 import me.arcanewarrior.com.Misc;
 import me.arcanewarrior.com.action.ActionPlayer;
+import me.arcanewarrior.com.action.items.ActionItemType;
+import me.arcanewarrior.com.managers.ItemManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Vec;
@@ -15,6 +17,11 @@ public class BrawlPlayer extends ActionPlayer {
     public BrawlPlayer(Player player, BrawlGame parent) {
         super(player);
         parentGame = parent;
+
+        // Hardcoded kit
+        giveActionItemType(ActionItemType.NYNEVE);
+        giveActionItemType(ActionItemType.PYRRHIC);
+        ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
     }
 
     // Random offset, so we aren't updating a bunch of players on the same tick
@@ -42,7 +49,7 @@ public class BrawlPlayer extends ActionPlayer {
     private double damagePercentage = 0;
 
     public void onDamageAttack(BrawlDamage damage) {
-        damage.setDamageAmount(9.2);
+
     }
 
     public void onDamageRecieve(BrawlDamage damage) {
