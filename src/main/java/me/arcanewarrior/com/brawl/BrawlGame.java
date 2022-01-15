@@ -136,6 +136,7 @@ public class BrawlGame {
 
     public void resetBrawlPlayer(BrawlPlayer player) {
         player.getPlayer().teleport(centerPos);
+        player.resetDamagePercent();
     }
 
     /**

@@ -26,8 +26,8 @@ public class BrawlDamage {
     public void fire() {
         float yaw = attacker.getYaw();
         // Y value currently unused
-        Vec knockback = new Vec(Math.sin(yaw), 0.1, -Math.cos(yaw));
-        float power = (float) (0.4 + reciever.getCurrentDamagePercent()/100);
+        Vec knockback = new Vec(Math.sin(yaw * Math.PI/180), 0.1, -Math.cos(yaw * Math.PI/180));
+        float power = (float) (0.4 + reciever.getCurrentDamagePercent()/50);
         reciever.applyKnockback(power, knockback);
     }
 }

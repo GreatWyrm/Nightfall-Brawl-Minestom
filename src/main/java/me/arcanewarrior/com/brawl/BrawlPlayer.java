@@ -54,6 +54,8 @@ public class BrawlPlayer extends ActionPlayer {
         return damagePercentage;
     }
 
+    public void resetDamagePercent() { damagePercentage = 0; }
+
     public void applyKnockback(float strength, Vec knockback) {
         player.takeKnockback(strength, knockback.x(), knockback.z());
     }
