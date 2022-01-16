@@ -25,13 +25,15 @@ public class BrawlGame {
     private final Task updateBrawlPlayers;
     private final BrawlEvents events;
     private final Instance brawlWorld;
-    private final Pos centerPos = new Pos(0, 40, 0);
+    private final Pos centerPos = new Pos(242, 39, 1348);
 
     private int tickCounter = 0;
 
     private final double BORDER_RADIUS = 40;
     // Calculated from = Half of the border radius, subtract 0.3, since border will stop you 0.3 blocks earlier if it's on an exact block boundry, and then 0.02 earlier for an epsilon value
     private final double BLAST_LINE_BOUNDRY = BORDER_RADIUS/2 - 0.3 - 0.02;
+
+    // TODO: Add upper and lower blast lines, use https://wiki.vg/Plugin_channels#minecraft:debug.2Fgame_test_add_marker as markers
 
     public BrawlGame(Instance worldInstance) {
         updateBrawlPlayers = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
@@ -104,20 +106,21 @@ public class BrawlGame {
 
     private void setupWorldBorder() {
         WorldBorder border = brawlWorld.getWorldBorder();
-        border.setCenter(0 ,0);
+        border.setCenter((float) centerPos.x(), (float) centerPos.z());
         border.setDiameter(BORDER_RADIUS);
     }
 
     public void warpAllToCenter() {
         for(BrawlPlayer player : brawlPlayerList.values()) {
+            player.getPlayer().setInstance(brawlWorld);
             player.getPlayer().teleport(centerPos);
         }
     }
 
     public boolean isInBlastLines(BrawlPlayer player) {
         Pos position = player.getPlayer().getPosition();
-        return position.x() <= -BLAST_LINE_BOUNDRY || position.x() >= BLAST_LINE_BOUNDRY ||
-                position.z() <= -BLAST_LINE_BOUNDRY || position.z() >= BLAST_LINE_BOUNDRY;
+        return position.x() <= -BLAST_LINE_BOUNDRY + centerPos.x() || position.x() >= BLAST_LINE_BOUNDRY + centerPos.x() ||
+                position.z() <= -BLAST_LINE_BOUNDRY + centerPos.z() || position.z() >= BLAST_LINE_BOUNDRY + centerPos.z();
     }
 
     public void blastLineParticles(BrawlPlayer player) {

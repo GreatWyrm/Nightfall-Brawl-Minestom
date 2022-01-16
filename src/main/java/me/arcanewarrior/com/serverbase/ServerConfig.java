@@ -6,6 +6,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.ping.ResponseData;
 import net.minestom.server.resourcepack.ResourcePack;
+import net.minestom.server.utils.identity.NamedAndIdentified;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,7 +16,7 @@ public class ServerConfig {
     private static final String CONFIG_PATH = "server-config.json";
     public static ServerConfigData serverConfigData = null;
     public static ResourcePack currentResourcePack = null;
-    private static final ResponseData responseData = new ResponseData();
+    private static int maxPlayers = 0;
 
     public static void loadServerConfig() {
         File file = new File(CONFIG_PATH);
@@ -38,7 +39,7 @@ public class ServerConfig {
                 e.printStackTrace();
             }
         }
-        responseData.setMaxPlayer(serverConfigData.maxPlayers());
+        maxPlayers = serverConfigData.maxPlayers();
     }
 
     public static void loadResourcePack() {
@@ -68,6 +69,11 @@ public class ServerConfig {
         }
     }
     public static ResponseData getServerResponseData() {
-        return responseData;
+        var data = new ResponseData();
+        data.setMaxPlayer(maxPlayers);
+        for(var player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+            data.addEntry(NamedAndIdentified.of(player.getUsername(), player.getUuid()));
+        }
+        return data;
     }
 }

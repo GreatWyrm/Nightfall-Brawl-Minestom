@@ -10,12 +10,15 @@ import me.arcanewarrior.com.managers.ItemManager;
 import me.arcanewarrior.com.managers.Manager;
 import me.arcanewarrior.com.managers.WorldManager;
 import me.arcanewarrior.com.serverbase.ServerConfig;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.server.ServerListPingEvent;
+import net.minestom.server.message.ChatPosition;
+import net.minestom.server.network.packet.server.play.ChatMessagePacket;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,7 +60,7 @@ public class GameCore {
 
         globalEventHandler.addListener(ServerListPingEvent.class, serverListPingEvent -> serverListPingEvent.setResponseData(ServerConfig.getServerResponseData()));
 
-        MainEventListener listener = new MainEventListener();
+        MainEventListener listener = new MainEventListener(this);
         listener.registerAllEvents();
 
     }
@@ -73,7 +76,10 @@ public class GameCore {
     // ------ BRAWL GAME DELEGATION ------
     // Safely wraps around the brawl game, performing null checks
     public void createNewBrawlGame() {
-        currentBrawlGame = new BrawlGame(WorldManager.getManager().getDefaultWorld());
+        if(!WorldManager.getManager().doesWorldExist("final-destination")) {
+            WorldManager.getManager().loadMinecraftWorld("final-destination");
+        }
+        currentBrawlGame = new BrawlGame(WorldManager.getManager().getWorld("final-destination"));
     }
 
     public void endBrawlGame() {
@@ -137,6 +143,13 @@ public class GameCore {
     public void warpPlayersToCenter() {
         if(currentBrawlGame != null) {
             currentBrawlGame.warpAllToCenter();
+        }
+    }
+
+    public void broadcastMessage(Component text) {
+        ChatMessagePacket packet = new ChatMessagePacket(text, ChatPosition.CHAT, UUID.randomUUID());
+        for(var player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+            player.sendPacket(packet);
         }
     }
 }

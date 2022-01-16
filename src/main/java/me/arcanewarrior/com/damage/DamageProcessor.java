@@ -1,61 +1,49 @@
 package me.arcanewarrior.com.damage;
 
 import me.arcanewarrior.com.damage.bow.Arrow;
-import net.minestom.server.attribute.Attribute;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EquipmentSlot;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.attribute.ItemAttribute;
+import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class DamageProcessor {
 
+    private final Task updateInvulTicks;
+
+    public DamageProcessor() {
+        updateInvulTicks = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            if(invulnerabilityTickTime.isEmpty()) return;
+
+            var iterator = invulnerabilityTickTime.keySet().iterator();
+            while(iterator.hasNext()) {
+                var key = iterator.next();
+                int ticks = invulnerabilityTickTime.compute(key, (uuid, integer) -> integer - 1);
+                if(ticks == 0) {
+                    invulnerabilityTickTime.remove(key);
+                }
+            }
+        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+    }
+
+    private final HashMap<UUID, Integer> invulnerabilityTickTime = new HashMap<>();
+
     public void processEntityAttackEvent(@NotNull EntityAttackEvent event) {
-        Entity attacker = event.getEntity();
-        Entity attackee = event.getTarget();
-        if(attackee instanceof LivingEntity targetLiving) {
+        DamageInstance instance = DamageUtils.createDamageInstance(event);
 
-            // Calculate damage amount
-            if(attacker instanceof LivingEntity attackerLiving) {
-                int totalDamage = 0;
-                for(EquipmentSlot slot : EquipmentSlot.values()) {
-                    ItemStack stack = attackerLiving.getEquipment(slot);
-                    if(!stack.isAir()) {
-                        // Sum damage from attribute
-                        for(ItemAttribute attribute : stack.getMeta().getAttributes()) {
-                            // If slots match and the attribute is attack damage
-                            if (slot.equals(EquipmentSlot.fromAttributeSlot(attribute.slot()))
-                                    && attribute.attribute().equals(Attribute.ATTACK_DAMAGE)) {
-
-                                //TODO: Attribute operations aren't taken into consideration
-                                totalDamage += attribute.amount();
-                            }
-                            if(slot == EquipmentSlot.MAIN_HAND) {
-                                short fireAspect = stack.getMeta().getEnchantmentMap().getOrDefault(Enchantment.FIRE_ASPECT, (short) 0);
-                                if(fireAspect > 0) {
-                                    targetLiving.setFireForDuration(4*fireAspect, ChronoUnit.SECONDS);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // If there isn't any damage, set damage to 1
-                if(totalDamage == 0) {
-                    totalDamage = 1;
-                }
-
-                targetLiving.damage(DamageType.fromEntity(event.getEntity()), totalDamage);
-            } else if(attacker instanceof Arrow arrow) {
-                targetLiving.damage(DamageType.fromProjectile(arrow.getShooter(), arrow), arrow.getFinalDamage());
+        if(instance != null) {
+            // If the attacked entity isn't invulnerable, process the damage
+            if(!invulnerabilityTickTime.containsKey(event.getTarget().getUuid())) {
+                instance.applyDamage();
+                invulnerabilityTickTime.put(event.getTarget().getUuid(), instance.getInvulnTicks());
             }
         }
     }

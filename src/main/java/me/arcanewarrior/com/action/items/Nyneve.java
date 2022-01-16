@@ -4,7 +4,6 @@ import me.arcanewarrior.com.action.ActionPlayer;
 import me.arcanewarrior.com.particles.ParticleGenerator;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.coordinate.Pos;
 import net.minestom.server.particle.Particle;
 
 public class Nyneve extends BaseActionItem {

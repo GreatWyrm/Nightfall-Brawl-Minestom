@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'me.arcanewarrior'
-version '0.0.2-ALPHA'
+version '0.0.3-ALPHA'
 
 repositories {
     mavenCentral()
@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Minestom:Minestom:517d6a3b7c'
+    implementation 'com.github.Minestom:Minestom:0163dd6f42'
      // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
     implementation 'org.spongepowered:configurate-yaml:4.1.2'
