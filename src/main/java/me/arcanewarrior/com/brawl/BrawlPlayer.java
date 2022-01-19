@@ -30,10 +30,6 @@ public class BrawlPlayer extends ActionPlayer {
     @Override
     public void update() {
         super.update();
-
-        if(everyNthTick(20)) {
-            updateActionBar();
-        }
     }
 
     private void updateActionBar() {
@@ -46,6 +42,8 @@ public class BrawlPlayer extends ActionPlayer {
     }
 
     // ---- Damage ----
+    private BrawlDamageInfo lastBrawlDamage;
+
     private double damagePercentage = 0;
 
     public void onDamageAttack(BrawlDamage damage) {
@@ -53,21 +51,34 @@ public class BrawlPlayer extends ActionPlayer {
     }
 
     public void onDamageRecieve(BrawlDamage damage) {
-        damagePercentage += damage.getDamageAmount();
+        damagePercentage = Math.min(999, damagePercentage + damage.getDamageAmount());
         updateActionBar();
+        if(damage.getAttacker() != null) {
+            lastBrawlDamage = new BrawlDamageInfo(damage.getAttacker(), damage.getUsedItem());
+        }
     }
 
     public double getCurrentDamagePercent() {
         return damagePercentage;
     }
 
-    public void resetDamagePercent() {
+    public void resetDamage() {
         damagePercentage = 0;
+        lastBrawlDamage = null;
         updateActionBar();
     }
 
     public void applyKnockback(float strength, Vec knockback) {
         player.takeKnockback(strength, knockback.x(), knockback.z());
+    }
+
+    public Component getKnockoutMessage() {
+        Component knockoutMessage = getDisplayName().hoverEvent(player.asHoverEvent());
+        if(lastBrawlDamage != null) {
+            return knockoutMessage.append(lastBrawlDamage.getKnockoutMessage());
+        } else {
+            return knockoutMessage.append(Component.text(" was knocked out."));
+        }
     }
 
     public float getYaw() {

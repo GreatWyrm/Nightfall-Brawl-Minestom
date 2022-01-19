@@ -2,6 +2,7 @@ package me.arcanewarrior.com.brawl;
 
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.particles.ParticleGenerator;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -41,15 +42,11 @@ public class BrawlGame {
                 player.update();
                 // Check if colliding with world border (blast lines)
                 if(isInBlastLines(player)) {
-                    blastLineParticles(player);
-                    resetBrawlPlayer(player);
+                    playerKnockout(player);
                 }
             }
             tickCounter++;
-
-
-
-        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+        }, TaskSchedule.seconds(8), TaskSchedule.tick(1));
         // Above, start immediately, run once per tick
         events = new BrawlEvents(this, MinecraftServer.getGlobalEventHandler());
         events.registerEvents();
@@ -112,15 +109,26 @@ public class BrawlGame {
 
     public void warpAllToCenter() {
         for(BrawlPlayer player : brawlPlayerList.values()) {
-            player.getPlayer().setInstance(brawlWorld);
-            player.getPlayer().teleport(centerPos);
+            player.getPlayer().setInstance(brawlWorld, centerPos);
         }
     }
+
+    // ----- KNOCKOUTS -----
 
     public boolean isInBlastLines(BrawlPlayer player) {
         Pos position = player.getPlayer().getPosition();
         return position.x() <= -BLAST_LINE_BOUNDRY + centerPos.x() || position.x() >= BLAST_LINE_BOUNDRY + centerPos.x() ||
                 position.z() <= -BLAST_LINE_BOUNDRY + centerPos.z() || position.z() >= BLAST_LINE_BOUNDRY + centerPos.z();
+    }
+
+    /**
+     * Call when a Brawl Player should be knocked out and reset
+     * @param player The player to count as "knocked out"
+     */
+    public void playerKnockout(BrawlPlayer player) {
+        broadcastToPlayers(player.getKnockoutMessage());
+        blastLineParticles(player);
+        resetBrawlPlayer(player);
     }
 
     public void blastLineParticles(BrawlPlayer player) {
@@ -132,15 +140,28 @@ public class BrawlGame {
             ParticleGenerator.spawnParticlesForAll(player.getPlayer(), Particle.CLOUD, currentPos, false, 0.4f, 0.4f, 0.4f, 0, 10, null);
             ParticleGenerator.spawnParticlesForAll(player.getPlayer(), Particle.END_ROD, currentPos, false, 0.4f, 0.4f, 0.4f, 0, 10, null);
             ParticleGenerator.spawnParticlesForAll(player.getPlayer(), Particle.DUST_COLOR_TRANSITION, currentPos, false, 0.4f, 0.4f, 0.4f, 0, 10,
-            ParticleGenerator.createDustTransitionData(1f, 1f, 1f, 3f, 0.3f, 0.8f, 0.4f));
+                ParticleGenerator.createDustTransitionData(1f, 1f, 1f, 3f, 0.3f, 0.8f, 0.4f));
             currentPos = currentPos.add(velocity);
         }
     }
 
     public void resetBrawlPlayer(BrawlPlayer player) {
         player.getPlayer().teleport(centerPos);
-        player.resetDamagePercent();
+        player.resetDamage();
     }
+
+    public void broadcastToPlayers(Component message) {
+        for(BrawlPlayer player : brawlPlayerList.values()) {
+            player.sendMessage(message);
+        }
+    }
+
+    public void broadcastToPlayers(String message) {
+        for(BrawlPlayer player : brawlPlayerList.values()) {
+            player.sendMessage(message);
+        }
+    }
+
 
     /**
      * Stops the current brawl game, cleaning up any variables that may have been initialized

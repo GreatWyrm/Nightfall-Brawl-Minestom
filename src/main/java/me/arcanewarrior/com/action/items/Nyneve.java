@@ -1,12 +1,15 @@
 package me.arcanewarrior.com.action.items;
 
 import me.arcanewarrior.com.action.ActionPlayer;
+import me.arcanewarrior.com.cooldown.UseCooldown;
 import me.arcanewarrior.com.particles.ParticleGenerator;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.particle.Particle;
 
 public class Nyneve extends BaseActionItem {
+
+    private final UseCooldown runedashCD = new UseCooldown(4*20, this::runedash);
 
 
     public Nyneve(ActionPlayer player, ActionItemType type) {
@@ -19,8 +22,17 @@ public class Nyneve extends BaseActionItem {
     }
 
     @Override
+    public void update() {
+        runedashCD.update();
+    }
+
+    @Override
     public void OnRightClick() {
+        runedashCD.tryUse();
         // Dash towards facing direction
+    }
+
+    private void runedash() {
         player.dashTowardsFacing(40);
         player.getPlayer().playSound(Sound.sound(Key.key("entity.pillager.celebrate"), Sound.Source.AMBIENT, 0.3f, 1f), Sound.Emitter.self());
     }
@@ -28,5 +40,10 @@ public class Nyneve extends BaseActionItem {
     @Override
     public String getBaseItemName() {
         return "nyneve";
+    }
+
+    @Override
+    public float getCooldown() {
+        return runedashCD.getCooldownPercentage();
     }
 }

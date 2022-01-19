@@ -13,6 +13,7 @@ import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityEvent;
+import net.minestom.server.item.ItemStack;
 
 public class BrawlEvents {
 
@@ -67,31 +68,38 @@ public class BrawlEvents {
                 if(event.getDamageType() instanceof EntityDamage entityDamage) {
                     BrawlPlayer attacker = parentGame.getBrawlPlayer(entityDamage.getSource().getUuid());
                     // It's fine if we have a null attacker, just be wary of it when calculating damage
-                    BrawlDamage brawlDamage = new BrawlDamage(attacker, target, damage);
+                    BrawlDamage brawlDamage;
                     if(attacker != null) {
+                        ItemStack itemUsed = attacker.getPlayer().getItemInMainHand();
+                        brawlDamage = new BrawlDamage(attacker, target, itemUsed, damage);
                         attacker.onDamageAttack(brawlDamage);
+                    } else {
+                        brawlDamage = new BrawlDamage(null, target, null, damage);
                     }
                     target.onDamageRecieve(brawlDamage);
                     brawlDamage.fireKnockback();
                 // BOW DAMAGE
                 } else if(event.getDamageType() instanceof EntityProjectileDamage projectileDamage) {
+                    ItemStack usedItem;
                     if(projectileDamage.getProjectile() instanceof Arrow arrow) {
                         damage = arrow.getFinalDamage();
+                        usedItem = arrow.getBowItem();
                     } else {
                         // Half damage compared to fully charged arrow
                         damage = 3;
+                        usedItem = null;
                     }
                     if(projectileDamage.getShooter() != null) {
                         BrawlPlayer attacker = parentGame.getBrawlPlayer(projectileDamage.getShooter());
                         // It's fine if we have a null attacker, just be wary of it when calculating damage
-                        BrawlDamage brawlDamage = new BrawlDamage(attacker, target, damage);
+                        BrawlDamage brawlDamage = new BrawlDamage(attacker, target, usedItem, damage);
                         if(attacker != null) {
                             attacker.onDamageAttack(brawlDamage);
                         }
                         target.onDamageRecieve(brawlDamage);
                         brawlDamage.fireKnockback();
                     } else {
-                        BrawlDamage brawlDamage = new BrawlDamage(null, target, damage);
+                        BrawlDamage brawlDamage = new BrawlDamage(null, target, usedItem, damage);
                         target.onDamageRecieve(brawlDamage);
                         brawlDamage.fireKnockback();
                     }

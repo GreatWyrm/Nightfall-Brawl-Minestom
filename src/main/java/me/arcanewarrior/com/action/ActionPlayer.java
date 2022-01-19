@@ -3,6 +3,7 @@ package me.arcanewarrior.com.action;
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.action.items.BaseActionBow;
 import me.arcanewarrior.com.action.items.BaseActionItem;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
@@ -31,6 +32,11 @@ public class ActionPlayer {
 
     public void update() {
         actionItemInventory.update();
+        // Set cooldown
+        BaseActionItem actionItem = actionItemInventory.getFromHeld(player.getItemInMainHand());
+        if(actionItem != null) {
+            player.setExp(actionItem.getCooldown());
+        }
     }
 
     // Bow Stuff
@@ -106,7 +112,16 @@ public class ActionPlayer {
         player.sendMessage(message);
     }
 
+    public void sendMessage(Component component) {player.sendMessage(component); }
+
     public Player getPlayer() {
         return player;
+    }
+    public Component getDisplayName() {
+        if(player.getDisplayName() != null) {
+            return player.getDisplayName();
+        } else {
+            return Component.text(player.getUsername());
+        }
     }
 }

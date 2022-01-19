@@ -96,4 +96,8 @@ public abstract class BaseActionItem {
     protected boolean isHoldingItem() {
         return doesItemMatch(player.getPlayer().getItemInMainHand());
     }
+
+    public float getCooldown() {
+        return 0;
+    }
 }

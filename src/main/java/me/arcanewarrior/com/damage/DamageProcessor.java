@@ -23,11 +23,9 @@ public class DamageProcessor {
         updateInvulTicks = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             if(invulnerabilityTickTime.isEmpty()) return;
 
-            var iterator = invulnerabilityTickTime.keySet().iterator();
-            while(iterator.hasNext()) {
-                var key = iterator.next();
+            for (UUID key : invulnerabilityTickTime.keySet()) {
                 int ticks = invulnerabilityTickTime.compute(key, (uuid, integer) -> integer - 1);
-                if(ticks == 0) {
+                if (ticks == 0) {
                     invulnerabilityTickTime.remove(key);
                 }
             }
@@ -63,6 +61,7 @@ public class DamageProcessor {
             } else {
                 arrow.setMultiplier(power);
             }
+            arrow.setBowItemStack(bowItem);
         }
     }
 }
