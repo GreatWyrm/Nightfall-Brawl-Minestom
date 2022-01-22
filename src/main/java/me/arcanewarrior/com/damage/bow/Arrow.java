@@ -1,5 +1,6 @@
 package me.arcanewarrior.com.damage.bow;
 
+import me.arcanewarrior.com.damage.MultiPartDamage;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityProjectile;
 import net.minestom.server.entity.EntityType;
@@ -10,8 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Arrow extends EntityProjectile {
 
-    private double baseDamage;
-    private double multiplier;
+    private final MultiPartDamage arrowDamage;
     // The bow that this arrow was fired from
     private ItemStack bowItem;
 
@@ -20,8 +20,8 @@ public class Arrow extends EntityProjectile {
     }
 
     public Arrow(@Nullable Entity shooter, @NotNull EntityType entityType) {
-
         super(shooter, entityType);
+        arrowDamage = new MultiPartDamage(2);
     }
 
     public void setCritical(boolean critical) {
@@ -38,13 +38,8 @@ public class Arrow extends EntityProjectile {
         return bowItem;
     }
 
-
-    public void setBaseDamage(double baseDamage) {
-        this.baseDamage = baseDamage;
-    }
-
-    public void setMultiplier(double multiplier) {
-        this.multiplier = multiplier;
+    public void multiplyDamage(double multiplier) {
+        arrowDamage.timesMult(multiplier);
     }
 
     public float getFinalDamage() {
@@ -52,6 +47,13 @@ public class Arrow extends EntityProjectile {
         if(getEntityMeta() instanceof AbstractArrowMeta arrowMeta) {
             critical = arrowMeta.isCritical();
         }
-        return (float) (baseDamage * multiplier * (critical ? 1.25 : 1));
+        if(critical) {
+            // Avoid modifiying the arrowDamage variable, clone and return
+            MultiPartDamage damage = arrowDamage.cloneDamage();
+            damage.timesMult(1.25);
+            return (float) damage.getValue();
+        } else {
+            return (float) arrowDamage.getValue();
+        }
     }
 }

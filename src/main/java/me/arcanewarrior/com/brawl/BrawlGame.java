@@ -46,7 +46,7 @@ public class BrawlGame {
                 }
             }
             tickCounter++;
-        }, TaskSchedule.seconds(8), TaskSchedule.tick(1));
+        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
         // Above, start immediately, run once per tick
         events = new BrawlEvents(this, MinecraftServer.getGlobalEventHandler());
         events.registerEvents();

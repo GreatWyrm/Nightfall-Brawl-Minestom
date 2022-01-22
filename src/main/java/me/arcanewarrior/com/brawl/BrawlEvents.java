@@ -1,6 +1,7 @@
 package me.arcanewarrior.com.brawl;
 
 import me.arcanewarrior.com.action.ActionPlayer;
+import me.arcanewarrior.com.action.items.ActionInputType;
 import me.arcanewarrior.com.damage.bow.Arrow;
 import net.minestom.server.entity.damage.EntityDamage;
 import net.minestom.server.entity.damage.EntityProjectileDamage;
@@ -32,13 +33,13 @@ public class BrawlEvents {
         node.addListener(PlayerUseItemEvent.class, event -> {
             BrawlPlayer player = parentGame.getBrawlPlayer(event.getPlayer());
             if(player != null) {
-                player.OnPlayerInput(ActionPlayer.InputType.RIGHT);
+                player.OnPlayerInput(ActionInputType.RIGHT);
             }
         });
         node.addListener(PlayerHandAnimationEvent.class, event -> {
             BrawlPlayer player = parentGame.getBrawlPlayer(event.getPlayer());
             if(player != null) {
-                player.OnPlayerInput(ActionPlayer.InputType.LEFT);
+                player.OnPlayerInput(ActionInputType.LEFT);
             }
         });
         // Bow

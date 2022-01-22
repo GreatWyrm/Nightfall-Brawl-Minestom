@@ -28,14 +28,10 @@ public abstract class BaseActionItem {
     }
 
     /**
-     * Called when the player left-clicks this item
+     * Called when a player performs an input.
+     * @param inputType The type of player input
      */
-    public abstract void OnLeftClick();
-
-    /**
-     * Called when the player right-clicks this item
-     */
-    public abstract void OnRightClick();
+    public abstract void onPlayerInput(ActionInputType inputType);
 
     /**
      * Called once every tick (20 times a second)

@@ -1,5 +1,6 @@
 package me.arcanewarrior.com.action;
 
+import me.arcanewarrior.com.action.items.ActionInputType;
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.action.items.BaseActionBow;
 import me.arcanewarrior.com.action.items.BaseActionItem;
@@ -53,7 +54,7 @@ public class ActionPlayer {
      * Called when the player fires their bow
      * @param projectile The projectile they are shooting
      * @param power The power of the projectile, ranges from 0 to 3
-     * @return The new entity to fire from this bow, and null if this shouldn't fire anything
+     * @return true if the bow should fire, false otherwise
      */
     public boolean OnBowFire(Entity projectile, double power) {
         ItemStack heldItem = player.getItemInMainHand();
@@ -63,10 +64,6 @@ public class ActionPlayer {
         }
         return false;
     }
-
-    // Damage
-
-
 
     // Movement
 
@@ -78,21 +75,11 @@ public class ActionPlayer {
         player.setVelocity(direction.mul(multiplier));
     }
 
-    // Inputs
-
-    public enum InputType {
-        LEFT,
-        RIGHT
-    }
-
-    public void OnPlayerInput(InputType type) {
+    public void OnPlayerInput(ActionInputType type) {
         ItemStack heldItem = player.getItemInMainHand();
         BaseActionItem actionItem = actionItemInventory.getFromHeld(heldItem);
         if(actionItem != null) {
-            switch (type) {
-                case LEFT -> actionItem.OnLeftClick();
-                case RIGHT -> actionItem.OnRightClick();
-            }
+            actionItem.onPlayerInput(type);
         }
     }
 

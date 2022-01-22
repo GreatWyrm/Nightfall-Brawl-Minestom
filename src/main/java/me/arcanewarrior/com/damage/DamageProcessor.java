@@ -52,14 +52,13 @@ public class DamageProcessor {
         // If this is an arrow, set damage and multiplier properly
         if(shooter instanceof LivingEntity livingEntity && projectile instanceof Arrow arrow) {
             ItemStack bowItem = livingEntity.getItemInMainHand();
-            arrow.setBaseDamage(2);
             short powerLevel = bowItem.getMeta().getEnchantmentMap().getOrDefault(Enchantment.POWER, (short) 0);
             double power = event.getPower();
             if(powerLevel > 0) {
                 // Formula from minecraft wiki: Power Damage multiplier = 1 + powerLevel * .25
-                arrow.setMultiplier(((powerLevel + 1) * .25 + 1) * power);
+                arrow.multiplyDamage(((powerLevel + 1) * .25 + 1) * power);
             } else {
-                arrow.setMultiplier(power);
+                arrow.multiplyDamage(power);
             }
             arrow.setBowItemStack(bowItem);
         }

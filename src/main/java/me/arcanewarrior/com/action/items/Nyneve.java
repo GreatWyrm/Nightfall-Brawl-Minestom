@@ -9,27 +9,25 @@ import net.minestom.server.particle.Particle;
 
 public class Nyneve extends BaseActionItem {
 
-    private final UseCooldown runedashCD = new UseCooldown(4*20, this::runedash);
+    private final UseCooldown runedashCD = new UseCooldown(2*20, this::runedash);
 
 
     public Nyneve(ActionPlayer player, ActionItemType type) {
         super(player, type);
     }
+
     @Override
-    public void OnLeftClick() {
-        ParticleGenerator.spawnParticlesForAll(player.getPlayer(), Particle.DUST, player.getPlayer().getPosition(), false,
-                1f, 1f, 1f, 1f, 20, ParticleGenerator.createDustData(0.8f, 1f, 1f, 2f));
+    public void onPlayerInput(ActionInputType inputType) {
+        switch (inputType) {
+            case LEFT -> ParticleGenerator.spawnParticlesForAll(player.getPlayer(), Particle.DUST, player.getPlayer().getPosition(), false,
+                    1f, 1f, 1f, 1f, 20, ParticleGenerator.createDustData(0.8f, 1f, 1f, 2f));
+            case RIGHT -> runedashCD.tryUse();
+        }
     }
 
     @Override
     public void update() {
         runedashCD.update();
-    }
-
-    @Override
-    public void OnRightClick() {
-        runedashCD.tryUse();
-        // Dash towards facing direction
     }
 
     private void runedash() {
