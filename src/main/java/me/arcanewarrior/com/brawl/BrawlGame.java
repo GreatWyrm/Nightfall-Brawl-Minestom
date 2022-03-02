@@ -46,7 +46,10 @@ public class BrawlGame {
                 }
             }
             tickCounter++;
-        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+        }, TaskSchedule.seconds(1), TaskSchedule.tick(1));
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            System.out.println("Test");
+        }).delay(TaskSchedule.minutes(1)).schedule();
         // Above, start immediately, run once per tick
         events = new BrawlEvents(this, MinecraftServer.getGlobalEventHandler());
         events.registerEvents();
@@ -116,7 +119,10 @@ public class BrawlGame {
     // ----- KNOCKOUTS -----
 
     public boolean isInBlastLines(BrawlPlayer player) {
-        Pos position = player.getPlayer().getPosition();
+        if(player.getInstance() != brawlWorld) {
+            return false;
+        }
+        Pos position = player.getPosition();
         return position.x() <= -BLAST_LINE_BOUNDRY + centerPos.x() || position.x() >= BLAST_LINE_BOUNDRY + centerPos.x() ||
                 position.z() <= -BLAST_LINE_BOUNDRY + centerPos.z() || position.z() >= BLAST_LINE_BOUNDRY + centerPos.z();
     }
@@ -157,9 +163,7 @@ public class BrawlGame {
     }
 
     public void broadcastToPlayers(String message) {
-        for(BrawlPlayer player : brawlPlayerList.values()) {
-            player.sendMessage(message);
-        }
+        broadcastToPlayers(Component.text(message));
     }
 
 

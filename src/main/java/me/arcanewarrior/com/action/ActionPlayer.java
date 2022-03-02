@@ -5,9 +5,11 @@ import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.action.items.BaseActionBow;
 import me.arcanewarrior.com.action.items.BaseActionItem;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,19 @@ public class ActionPlayer {
         if(actionItem instanceof BaseActionBow actionBow) {
             actionBow.setBowStartDrawing(currentTime);
         }
+    }
+
+    // Shield stuff
+    public void OnStartShielding(long currentTime) {
+
+    }
+
+    /**
+     * Called for various things, like bow stop drawing and shield stop holding
+     * @param itemStack The itemstack that was updated
+     */
+    public void updateItemState(ItemStack itemStack) {
+
     }
 
     /**
@@ -91,6 +106,20 @@ public class ActionPlayer {
 
     public void removeActionItemType(ActionItemType type) {
         actionItemInventory.removeFromInventory(type);
+    }
+
+    // ---- Position ----
+
+    public Instance getInstance() {
+        return player.getInstance();
+    }
+
+    public Instance getWorld() {
+        return getInstance();
+    }
+
+    public Pos getPosition() {
+        return player.getPosition();
     }
 
     // ---- Misc ----

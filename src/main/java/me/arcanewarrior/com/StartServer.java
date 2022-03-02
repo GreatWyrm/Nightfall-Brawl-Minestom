@@ -11,7 +11,9 @@ public class StartServer {
         // Enable Mojang Authentication, so stuff like skins will work
         MojangAuth.init();
         // Read in Server Config
-        MinecraftServer.LOGGER.info("Server Base initialized, reading server-config.data...");
+        MinecraftServer.LOGGER.info("Server Base initialized, reading server-config.json data...");
+        // TODO: Make this better
+        // Have a server-config.yml file
         ServerConfig.loadServerConfig();
         ServerConfig.loadResourcePack();
         MinecraftServer.LOGGER.info("Config initialized, loading Game Core...");

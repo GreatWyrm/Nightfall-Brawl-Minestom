@@ -9,7 +9,8 @@ public enum ActionItemType {
 
 
     NYNEVE(Nyneve::new),
-    PYRRHIC(Pyrrhic::new)
+    PYRRHIC(Pyrrhic::new),
+    HORN(Horn::new),
 
     ;
 

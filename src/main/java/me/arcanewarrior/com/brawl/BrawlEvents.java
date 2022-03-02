@@ -1,6 +1,5 @@
 package me.arcanewarrior.com.brawl;
 
-import me.arcanewarrior.com.action.ActionPlayer;
 import me.arcanewarrior.com.action.items.ActionInputType;
 import me.arcanewarrior.com.damage.bow.Arrow;
 import net.minestom.server.entity.damage.EntityDamage;
@@ -10,6 +9,7 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityShootEvent;
+import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
@@ -48,7 +48,15 @@ public class BrawlEvents {
             if(player != null) {
                 if(event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.BOW || event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.CROSSBOW) {
                     player.OnStartDrawing(System.currentTimeMillis());
+                } else if(event.getItemAnimationType() == PlayerItemAnimationEvent.ItemAnimationType.SHIELD) {
+                    player.OnStartShielding(System.currentTimeMillis());
                 }
+            }
+        });
+        node.addListener(ItemUpdateStateEvent.class, event -> {
+            BrawlPlayer player = parentGame.getBrawlPlayer(event.getPlayer());
+            if(player != null) {
+                player.updateItemState(event.getItemStack());
             }
         });
         node.addListener(EntityShootEvent.class, event -> {
@@ -77,7 +85,7 @@ public class BrawlEvents {
                     } else {
                         brawlDamage = new BrawlDamage(null, target, null, damage);
                     }
-                    target.onDamageRecieve(brawlDamage);
+                    target.onDamageReceive(brawlDamage);
                     brawlDamage.fireKnockback();
                 // BOW DAMAGE
                 } else if(event.getDamageType() instanceof EntityProjectileDamage projectileDamage) {
@@ -97,16 +105,14 @@ public class BrawlEvents {
                         if(attacker != null) {
                             attacker.onDamageAttack(brawlDamage);
                         }
-                        target.onDamageRecieve(brawlDamage);
+                        target.onDamageReceive(brawlDamage);
                         brawlDamage.fireKnockback();
                     } else {
                         BrawlDamage brawlDamage = new BrawlDamage(null, target, usedItem, damage);
-                        target.onDamageRecieve(brawlDamage);
+                        target.onDamageReceive(brawlDamage);
                         brawlDamage.fireKnockback();
                     }
                 }
-
-
                 event.setDamage(0);
             }
         });

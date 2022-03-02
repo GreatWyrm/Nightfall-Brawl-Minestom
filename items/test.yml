@@ -36,3 +36,8 @@ pyrrhic:
   material: "bow"
   name: Pyrrhic
   lore: "The Action Bow"
+
+horn:
+  material: "shield"
+  name: Horn
+  lore: "Definitely a horn"

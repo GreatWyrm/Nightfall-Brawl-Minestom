@@ -1,47 +1,33 @@
 package me.arcanewarrior.com.damage;
 
 import me.arcanewarrior.com.damage.bow.Arrow;
-import net.minestom.server.MinecraftServer;
+import me.arcanewarrior.com.damage.invulnticks.InvulnerabilityTicks;
+import me.arcanewarrior.com.damage.invulnticks.InvulnerabilityTicksImpl;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.timer.Task;
-import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.UUID;
 
 public class DamageProcessor {
 
-    private final Task updateInvulTicks;
+    private final InvulnerabilityTicks invulnTickManager;
 
     public DamageProcessor() {
-        updateInvulTicks = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
-            if(invulnerabilityTickTime.isEmpty()) return;
-
-            for (UUID key : invulnerabilityTickTime.keySet()) {
-                int ticks = invulnerabilityTickTime.compute(key, (uuid, integer) -> integer - 1);
-                if (ticks == 0) {
-                    invulnerabilityTickTime.remove(key);
-                }
-            }
-        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+        invulnTickManager = new InvulnerabilityTicksImpl();
     }
-
-    private final HashMap<UUID, Integer> invulnerabilityTickTime = new HashMap<>();
 
     public void processEntityAttackEvent(@NotNull EntityAttackEvent event) {
         DamageInstance instance = DamageUtils.createDamageInstance(event);
 
         if(instance != null) {
             // If the attacked entity isn't invulnerable, process the damage
-            if(!invulnerabilityTickTime.containsKey(event.getTarget().getUuid())) {
+            if(!invulnTickManager.isEntityInvulnerable(event.getTarget())) {
                 instance.applyDamage();
-                invulnerabilityTickTime.put(event.getTarget().getUuid(), instance.getInvulnTicks());
+                invulnTickManager.setInvulnerabilityTicks(event.getTarget(), instance.getInvulnerableTicks());
             }
         }
     }

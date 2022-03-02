@@ -23,7 +23,7 @@ public class DamageInstance {
     /** The amount of fire ticks to apply */
     private int fireTicks = 0;
     /** The amount of invulnerability ticks this damage will grant */
-    private int invulnTicks = DEFAULT_INVULN_TICKS;
+    private int invulnerableTicks = DEFAULT_INVULN_TICKS;
 
     public DamageInstance(@NotNull LivingEntity receiver, DamageType damageType, float damageAmount) {
         this.receiver = receiver;
@@ -41,12 +41,12 @@ public class DamageInstance {
         }
     }
 
-    public int getInvulnTicks() {
-        return invulnTicks;
+    public int getInvulnerableTicks() {
+        return invulnerableTicks;
     }
 
-    public void setInvulnTicks(int invulnTicks) {
-        this.invulnTicks = invulnTicks;
+    public void setInvulnerableTicks(int invulnerableTicks) {
+        this.invulnerableTicks = invulnerableTicks;
     }
 
     public void setFireTicks(int fireTicks) {

@@ -8,6 +8,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
+import net.minestom.server.network.packet.server.play.ExplosionPacket;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
+
+import java.text.DecimalFormat;
 
 public class BrawlPlayer extends ActionPlayer {
 
@@ -21,6 +26,7 @@ public class BrawlPlayer extends ActionPlayer {
         // Hardcoded kit
         giveActionItemType(ActionItemType.NYNEVE);
         giveActionItemType(ActionItemType.PYRRHIC);
+        giveActionItemType(ActionItemType.HORN);
         ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
     }
 
@@ -30,11 +36,21 @@ public class BrawlPlayer extends ActionPlayer {
     @Override
     public void update() {
         super.update();
+
+        if(everyNthTick(20)) {
+            updateActionBar();
+        }
     }
 
+    private final DecimalFormat df = new DecimalFormat("###.##");
     private void updateActionBar() {
-        // TODO Format number
-        player.sendActionBar(Component.text("Damage: " + damagePercentage, NamedTextColor.RED));
+        player.sendActionBar(Component.text("Damage: " + df.format(damagePercentage), NamedTextColor.RED));
+    }
+
+    public void modifyGravity(int negativeModifier, int duration) {
+        // Annoying workaround, Java thinks that inlining the byte variable in the constructor is an int, not a byte
+        byte b = Potion.AMBIENT_FLAG | Potion.ICON_FLAG | Potion.PARTICLES_FLAG;
+        player.addEffect(new Potion(PotionEffect.LEVITATION, (byte) negativeModifier, duration, b));
     }
 
     private boolean everyNthTick(int n) {
@@ -50,7 +66,7 @@ public class BrawlPlayer extends ActionPlayer {
 
     }
 
-    public void onDamageRecieve(BrawlDamage damage) {
+    public void onDamageReceive(BrawlDamage damage) {
         damagePercentage = Math.min(999, damagePercentage + damage.getDamageAmount());
         updateActionBar();
         if(damage.getAttacker() != null) {
@@ -69,7 +85,33 @@ public class BrawlPlayer extends ActionPlayer {
     }
 
     public void applyKnockback(float strength, Vec knockback) {
-        player.takeKnockback(strength, knockback.x(), knockback.z());
+        if(player.isSneaking() && player.isOnGround()) {
+            strength *= 0.7f;
+        }
+
+        // Prevent knockback from overflowing
+        if(damagePercentage > 100) {
+            if(strength > 0) {
+                // Get current Velocity
+                Vec currentVel = player.getVelocity();
+                Vec knockbackVel = knockback.normalize();
+                // Strength at 100% is about 2.4 and should scale up 2 per additional hundred percent
+                // Calculation, take into account the current velocity and the new velocity
+                strength *= 0.9;
+                Vec newVelocity = new Vec(
+                        currentVel.x() / 1.2d - knockbackVel.x() * strength, // x
+                        player.isOnGround() ? Math.max(0.8f, currentVel.x() / 2d + knockbackVel.y() * strength) : currentVel.x() / 2d + knockbackVel.y() * strength, // y
+                        currentVel.z() / 1.2d - knockbackVel.z() * strength // z
+                );
+                // Rough formula, this, velocity.x/2 * 10 blocks traveled
+                ExplosionPacket packet = new ExplosionPacket((float) player.getPosition().x(), (float) player.getPosition().y(), (float) player.getPosition().z(),
+                        -1f, new byte[0], (float) newVelocity.x(), (float) newVelocity.y(), (float) newVelocity.z());
+                player.sendPacket(packet);
+            }
+        } else {
+            player.takeKnockback(strength, knockback.x(), knockback.z());
+        }
+        modifyGravity(-5, 15);
     }
 
     public Component getKnockoutMessage() {
