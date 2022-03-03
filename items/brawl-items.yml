@@ -1,0 +1,22 @@
+nyneve:
+  material: "diamond_sword"
+  name: Nyneve
+  attributes:
+    - attribute: "attack_damage"
+      amount: 15
+  lore: "Arcane's First Action Item"
+  base-kb: 35
+  scaling-kb: 10
+
+
+pyrrhic:
+  material: "bow"
+  name: Pyrrhic
+  lore: "The Action Bow"
+  base-kb: 40
+  scaling-kb: 8
+
+horn:
+  material: "shield"
+  name: Horn
+  lore: "Definitely a horn"

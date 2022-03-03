@@ -24,20 +24,3 @@ galvan:
   material: "arrow"
   name: "Galvan"
   lore: "The first arrow"
-nyneve:
-  material: "diamond_sword"
-  name: Nyneve
-  attributes:
-    - attribute: "attack_damage"
-      amount: 15
-  lore: "Arcane's First Action Item"
-
-pyrrhic:
-  material: "bow"
-  name: Pyrrhic
-  lore: "The Action Bow"
-
-horn:
-  material: "shield"
-  name: Horn
-  lore: "Definitely a horn"

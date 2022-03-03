@@ -13,6 +13,7 @@ import net.minestom.server.instance.WorldBorder;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,9 +48,6 @@ public class BrawlGame {
             }
             tickCounter++;
         }, TaskSchedule.seconds(1), TaskSchedule.tick(1));
-        MinecraftServer.getSchedulerManager().buildTask(() -> {
-            System.out.println("Test");
-        }).delay(TaskSchedule.minutes(1)).schedule();
         // Above, start immediately, run once per tick
         events = new BrawlEvents(this, MinecraftServer.getGlobalEventHandler());
         events.registerEvents();
@@ -63,11 +61,11 @@ public class BrawlGame {
         return brawlPlayerList.values().stream().map(player -> player.getPlayer().getUsername()).collect(Collectors.toSet());
     }
 
-    public BrawlPlayer getBrawlPlayer(UUID uuid) {
+    public @Nullable BrawlPlayer getBrawlPlayer(UUID uuid) {
         return brawlPlayerList.get(uuid);
     }
 
-    public BrawlPlayer getBrawlPlayer(Entity entity) {
+    public @Nullable BrawlPlayer getBrawlPlayer(Entity entity) {
         return getBrawlPlayer(entity.getUuid());
     }
 

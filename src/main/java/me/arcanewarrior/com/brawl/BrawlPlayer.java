@@ -84,18 +84,17 @@ public class BrawlPlayer extends ActionPlayer {
         updateActionBar();
     }
 
-    public void applyKnockback(float strength, Vec knockback) {
+    public void applyKnockback(double strength, Vec knockback) {
         if(player.isSneaking() && player.isOnGround()) {
-            strength *= 0.7f;
+            strength *= 0.7;
         }
 
-        // Prevent knockback from overflowing
+        // Prevent knockback from overflowing when using standard velocity packets
         if(damagePercentage > 100) {
             if(strength > 0) {
                 // Get current Velocity
                 Vec currentVel = player.getVelocity();
                 Vec knockbackVel = knockback.normalize();
-                // Strength at 100% is about 2.4 and should scale up 2 per additional hundred percent
                 // Calculation, take into account the current velocity and the new velocity
                 strength *= 0.9;
                 Vec newVelocity = new Vec(
@@ -109,7 +108,7 @@ public class BrawlPlayer extends ActionPlayer {
                 player.sendPacket(packet);
             }
         } else {
-            player.takeKnockback(strength, knockback.x(), knockback.z());
+            player.takeKnockback((float) strength, knockback.x(), knockback.z());
         }
         modifyGravity(-5, 15);
     }

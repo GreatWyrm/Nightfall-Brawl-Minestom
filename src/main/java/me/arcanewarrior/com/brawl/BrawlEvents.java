@@ -79,14 +79,11 @@ public class BrawlEvents {
                     // It's fine if we have a null attacker, just be wary of it when calculating damage
                     BrawlDamage brawlDamage;
                     if(attacker != null) {
-                        ItemStack itemUsed = attacker.getPlayer().getItemInMainHand();
-                        brawlDamage = new BrawlDamage(attacker, target, itemUsed, damage);
-                        attacker.onDamageAttack(brawlDamage);
+                        brawlDamage = new BrawlDamage(attacker, target, damage);
                     } else {
                         brawlDamage = new BrawlDamage(null, target, null, damage);
                     }
-                    target.onDamageReceive(brawlDamage);
-                    brawlDamage.fireKnockback();
+                    brawlDamage.fire();
                 // BOW DAMAGE
                 } else if(event.getDamageType() instanceof EntityProjectileDamage projectileDamage) {
                     ItemStack usedItem;
@@ -102,15 +99,10 @@ public class BrawlEvents {
                         BrawlPlayer attacker = parentGame.getBrawlPlayer(projectileDamage.getShooter());
                         // It's fine if we have a null attacker, just be wary of it when calculating damage
                         BrawlDamage brawlDamage = new BrawlDamage(attacker, target, usedItem, damage);
-                        if(attacker != null) {
-                            attacker.onDamageAttack(brawlDamage);
-                        }
-                        target.onDamageReceive(brawlDamage);
-                        brawlDamage.fireKnockback();
+                        brawlDamage.fire();
                     } else {
                         BrawlDamage brawlDamage = new BrawlDamage(null, target, usedItem, damage);
-                        target.onDamageReceive(brawlDamage);
-                        brawlDamage.fireKnockback();
+                        brawlDamage.fire();
                     }
                 }
                 event.setDamage(0);

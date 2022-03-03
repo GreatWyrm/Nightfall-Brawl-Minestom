@@ -59,7 +59,7 @@ public class ItemLoader {
         return loadedItems;
     }
 
-    private ItemStack createItemFromNode(CommentedConfigurationNode node) {
+    protected ItemStack createItemFromNode(CommentedConfigurationNode node) {
 
         CommentedConfigurationNode materialNode = node.node("material");
         if(materialNode.isNull()) {
