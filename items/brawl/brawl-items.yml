@@ -20,3 +20,5 @@ horn:
   material: "shield"
   name: Horn
   lore: "Definitely a horn"
+  base-kb: 5
+  scaling-kb: 20

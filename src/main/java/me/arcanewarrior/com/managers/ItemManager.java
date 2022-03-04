@@ -1,6 +1,7 @@
 package me.arcanewarrior.com.managers;
 
 import me.arcanewarrior.com.GameCore;
+import me.arcanewarrior.com.items.BrawlItemLoader;
 import me.arcanewarrior.com.items.ItemLoader;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.TransactionOption;
@@ -33,14 +34,25 @@ public class ItemManager implements Manager {
     }
 
     private void loadItemsFromItemFolder() {
-        ItemLoader itemLoader = new ItemLoader();
+        // Parent directory
         Path itemFolder = Paths.get("items");
         if(Files.exists(itemFolder) && Files.isDirectory(itemFolder)) {
-            try {
-                Files.list(itemFolder).forEach(path -> itemList.putAll(itemLoader.loadAllItems(path)));
-            } catch (IOException e) {
-                e.printStackTrace();
+            Path basicItemFolder = itemFolder.resolve("basic");
+            if(Files.exists(basicItemFolder) && Files.isDirectory(basicItemFolder)) {
+                loadItemsFromParentFolder(basicItemFolder, new ItemLoader());
             }
+            Path brawlItemFolder = itemFolder.resolve("brawl");
+            if(Files.exists(brawlItemFolder) && Files.isDirectory(brawlItemFolder)) {
+                loadItemsFromParentFolder(brawlItemFolder, new BrawlItemLoader());
+            }
+        }
+    }
+
+    private void loadItemsFromParentFolder(Path parentFolder, ItemLoader loader) {
+        try {
+            Files.list(parentFolder).forEach(path -> itemList.putAll(loader.loadAllItems(path)));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

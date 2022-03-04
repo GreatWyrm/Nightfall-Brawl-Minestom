@@ -58,7 +58,7 @@ public class GameCore {
         });
 
 
-        globalEventHandler.addListener(ServerListPingEvent.class, serverListPingEvent -> serverListPingEvent.setResponseData(ServerConfig.getServerResponseData()));
+
 
         MainEventListener listener = new MainEventListener(this);
         listener.registerAllEvents();

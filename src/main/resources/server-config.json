@@ -1,7 +1,0 @@
-{
-  "maxPlayers": 50,
-  "serverPort": 25565,
-  "forceResourcePack": false,
-  "resourcePackURL": "",
-  "resourcePackHash": ""
-}

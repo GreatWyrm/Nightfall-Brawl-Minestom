@@ -1,0 +1,8 @@
+maxPlayers: 50
+serverPort: 25565
+# Uses the Legacy Ampersand deserializer
+motd: "&9Night&4fall &6Brawl"
+# Resource Pack Stuff
+forceResourcePack: false
+resourcePackURL: ""
+resourcePackHash: ""

@@ -1,10 +1,10 @@
 plugins {
     id 'java'
-    id "com.github.johnrengelman.shadow" version "7.1.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group 'me.arcanewarrior'
-version '0.0.3-ALPHA'
+version '0.0.4-ALPHA'
 
 repositories {
     mavenCentral()
@@ -14,8 +14,7 @@ repositories {
 
 dependencies {
     implementation 'com.github.Minestom:Minestom:3e184abc0f'
-     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
+    implementation 'com.google.guava:guava:31.1-jre'
     implementation 'org.spongepowered:configurate-yaml:4.1.2'
 }
 

@@ -2,7 +2,7 @@ package me.arcanewarrior.com.damage;
 
 import me.arcanewarrior.com.damage.bow.Arrow;
 import me.arcanewarrior.com.damage.invulnticks.InvulnerabilityTicks;
-import me.arcanewarrior.com.damage.invulnticks.InvulnerabilityTicksImpl;
+import me.arcanewarrior.com.damage.invulnticks.InvulnerabilityTicksConcurrentImpl;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.event.entity.EntityAttackEvent;
@@ -17,7 +17,7 @@ public class DamageProcessor {
     private final InvulnerabilityTicks invulnTickManager;
 
     public DamageProcessor() {
-        invulnTickManager = new InvulnerabilityTicksImpl();
+        invulnTickManager = new InvulnerabilityTicksConcurrentImpl();
     }
 
     public void processEntityAttackEvent(@NotNull EntityAttackEvent event) {
