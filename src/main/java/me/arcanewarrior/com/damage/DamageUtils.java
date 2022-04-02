@@ -18,6 +18,8 @@ public class DamageUtils {
         Entity attacker = event.getEntity();
         if(event.getTarget() instanceof LivingEntity targetLiving) {
             // Calculate damage amount
+            System.out.println(attacker.getEntityType());
+            System.out.println(attacker.getClass().getCanonicalName());
             if(attacker instanceof LivingEntity attackerLiving) {
                 int totalDamage = 0;
                 int fireTicks = 0;

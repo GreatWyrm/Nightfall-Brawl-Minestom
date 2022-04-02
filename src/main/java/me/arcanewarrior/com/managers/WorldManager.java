@@ -48,6 +48,7 @@ public class WorldManager implements Manager {
         loader.loadInstance(newWorld);
         newWorld.setChunkGenerator(new VoidChunkGenerator());
         worldList.put(path, newWorld);
+        getWorldSpawnPoint(path);
     }
 
     public void unloadMinecraftWorld(String worldName, boolean save) {
@@ -66,15 +67,29 @@ public class WorldManager implements Manager {
         MinecraftServer.getInstanceManager().unregisterInstance(world);
     }
 
-    public Pos getWorldSpawnPoint(String worldName) {
+    /**
+     * Gets the world spawn point from the NBT tag associated with that world, or null
+     * if that world does not exist
+     * @param worldName The name of the world to get the spawn point of
+     * @return A Pos object that represents the spawnpoint, or null if no such world exists
+     */
+    public @Nullable Pos getWorldSpawnPoint(String worldName) {
         if(!doesWorldExist(worldName)) return null;
 
         InstanceContainer world = worldList.get(worldName);
-        NBTCompound worldLevelDat = world.getTag(Tag.NBT);
-        NBTCompound data = worldLevelDat.getCompound("Data");
-        int x = data.getInt("SpawnX");
-        int y = data.getInt("SpawnY");
-        int z = data.getInt("SpawnZ");
+        NBTCompound worldLevelDat = world.getTag(Tag.NBT("Data"));
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        if(worldLevelDat.containsKey("SpawnX")) {
+            x = worldLevelDat.getInt("SpawnX");
+        }
+        if(worldLevelDat.containsKey("SpawnY")) {
+            y = worldLevelDat.getInt("SpawnY");
+        }
+        if(worldLevelDat.containsKey("SpawnZ")) {
+            z = worldLevelDat.getInt("SpawnZ");
+        }
         return new Pos(x, y, z);
     }
 
@@ -92,7 +107,7 @@ public class WorldManager implements Manager {
         data.setInt("SpawnZ", 0);
         NBTCompound parent = new NBTCompound();
         parent.plus(data);
-        instanceContainer.setTag(Tag.NBT,parent);
+        instanceContainer.setTag(Tag.NBT("Data"),parent);
         worldList.put(DEFAULT_WORLD_NAME, instanceContainer);
     }
 

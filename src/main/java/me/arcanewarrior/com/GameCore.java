@@ -6,9 +6,7 @@ import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.brawl.BrawlGame;
 import me.arcanewarrior.com.commands.CommandStarter;
 import me.arcanewarrior.com.events.MainEventListener;
-import me.arcanewarrior.com.managers.ItemManager;
-import me.arcanewarrior.com.managers.Manager;
-import me.arcanewarrior.com.managers.WorldManager;
+import me.arcanewarrior.com.managers.*;
 import me.arcanewarrior.com.serverbase.ServerConfig;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -42,6 +40,8 @@ public class GameCore {
         ImmutableClassToInstanceMap.Builder<Manager> builder = ImmutableClassToInstanceMap.builder();
         builder.put(WorldManager.class, new WorldManager());
         builder.put(ItemManager.class, new ItemManager());
+        builder.put(BrawlPlayerDataManager.class, new BrawlPlayerDataManager());
+        builder.put(LoadoutManager.class, new LoadoutManager());
 
         this.managers = builder.build();
 

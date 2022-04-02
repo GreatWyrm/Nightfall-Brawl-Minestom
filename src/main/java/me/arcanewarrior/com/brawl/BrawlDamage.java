@@ -15,7 +15,7 @@ public class BrawlDamage {
 
     // Regards to knockback
     private double damageAmount;
-    private final int baseKnockback;
+    private final double baseKnockback;
     private final double knockbackScaling;
 
     public BrawlDamage(@NotNull BrawlPlayer attacker, BrawlPlayer receiver, float damageAmount) {
@@ -27,11 +27,19 @@ public class BrawlDamage {
         this.usedItem = usedItem;
         this.damageAmount = damageAmount;
         if(usedItem != null && !usedItem.isAir()) {
-            baseKnockback = usedItem.getTag(Tag.Integer(BrawlTags.NBT_BASE_KNOCKBACK_KEY));
-            knockbackScaling = usedItem.getTag(Tag.Double(BrawlTags.NBT_SCALING_KNOCKBACK_KEY));
+            if(usedItem.hasTag(Tag.Double(BrawlTags.NBT_BASE_KNOCKBACK_KEY))) {
+                this.baseKnockback = usedItem.getTag(Tag.Double(BrawlTags.NBT_BASE_KNOCKBACK_KEY));
+            } else {
+                this.baseKnockback = 10;
+            }
+            if(usedItem.hasTag(Tag.Double(BrawlTags.NBT_SCALING_KNOCKBACK_KEY))) {
+                this.knockbackScaling = usedItem.getTag(Tag.Double(BrawlTags.NBT_SCALING_KNOCKBACK_KEY));
+            } else {
+                this.knockbackScaling = 2;
+            }
         } else {
-            baseKnockback = 25;
-            knockbackScaling = 5;
+            this.baseKnockback = 10;
+            this.knockbackScaling = 2;
         }
     }
 
@@ -50,14 +58,11 @@ public class BrawlDamage {
     private void fireKnockback() {
         if(attacker != null) {
             Vec knockback = attacker.getPosition().sub(receiver.getPosition()).asVec();
-            // float yaw = attacker.getYaw();
-            //Vec knockback = new Vec(Math.sin(yaw * Math.PI/180), receiver.getPosition().y() - attacker.getPosition().y(), -Math.cos(yaw * Math.PI/180));
-
             // Knockback calculation, includes:
-            // Damage of attack / 40
+            // Damage of attack / 30 + damage total
             // Base Knockback / 100
             // Knockback scaling * damagePercent / 200
-            double power = damageAmount / 40d + baseKnockback / 100d + knockbackScaling * receiver.getCurrentDamagePercent()/200;
+            double power = damageAmount / 30d + baseKnockback / 100d + knockbackScaling * receiver.getCurrentDamagePercent()/200;
             receiver.applyKnockback(power, knockback);
         }
     }
