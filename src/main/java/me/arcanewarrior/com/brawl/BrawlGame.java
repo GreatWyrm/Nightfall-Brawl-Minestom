@@ -1,6 +1,7 @@
 package me.arcanewarrior.com.brawl;
 
 import me.arcanewarrior.com.action.items.ActionItemType;
+import me.arcanewarrior.com.managers.BrawlPlayerDataManager;
 import me.arcanewarrior.com.particles.ParticleGenerator;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -72,9 +73,11 @@ public class BrawlGame {
     public void addBrawlPlayer(Player player) {
         UUID id = player.getUuid();
         if(brawlPlayerList.containsKey(id)) {
-            throw new IllegalStateException("Cannot add player " + player.getName() + " to the Action Player List, as they are already in it!");
+            throw new IllegalStateException("Cannot add player " + player.getName() + " to the Brawl Player List List, as they are already in it!");
         }
-        brawlPlayerList.put(id, new BrawlPlayer(player, this));
+        // Get their loadout
+        Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player).getCurrentLoadout();
+        brawlPlayerList.put(id, new BrawlPlayer(player, this, loadout));
     }
 
     public boolean isBrawlPlayer(Player player) {

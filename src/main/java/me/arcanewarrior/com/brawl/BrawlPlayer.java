@@ -19,18 +19,18 @@ public class BrawlPlayer extends ActionPlayer {
     private final BrawlGame parentGame;
 
 
-    public BrawlPlayer(Player player, BrawlGame parent) {
+    public BrawlPlayer(Player player, BrawlGame parent, Loadout loadout) {
         super(player);
         parentGame = parent;
 
-        // Hardcoded kit
-        giveActionItemType(ActionItemType.NYNEVE);
-        giveActionItemType(ActionItemType.PYRRHIC);
-        giveActionItemType(ActionItemType.HORN);
+        for(ActionItemType type : loadout.actionItems()) {
+            giveActionItemType(type);
+        }
+        // Hardcoded arrows
         ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
     }
 
-    // Random offset, so we aren't updating a bunch of players on the same tick
+    // Random offset, to spread out various ticking things
     private final int tickOffset = Misc.randomInt(0, 2519);
 
     @Override

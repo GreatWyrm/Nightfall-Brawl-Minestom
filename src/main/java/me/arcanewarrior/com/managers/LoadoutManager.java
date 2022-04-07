@@ -3,7 +3,6 @@ package me.arcanewarrior.com.managers;
 import me.arcanewarrior.com.GameCore;
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.brawl.Loadout;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;

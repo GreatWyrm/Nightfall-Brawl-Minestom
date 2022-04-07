@@ -89,7 +89,7 @@ public class ItemLoader {
         String loreLines = loreNode.getString("default");
         if (loreLines != null) {
             for(String line : loreLines.split("\n")) {
-                lore.add(Component.text(line, Style.style(formatStyle.getLoreColor(), TextDecoration.ITALIC.as(false))));
+                lore.add(Component.text(line, Style.style(formatStyle.getLoreColor(), TextDecoration.ITALIC.withState(false))));
             }
         }
 
@@ -132,7 +132,7 @@ public class ItemLoader {
 
         return ItemStack.builder(baseMaterial)
                 .displayName(Component.text(itemName,
-                        Style.style(formatStyle.getNameColor(), TextDecoration.ITALIC.as(false)))
+                        Style.style(formatStyle.getNameColor(), TextDecoration.ITALIC.withState(false)))
                 )
                 .meta(itemMetaBuilder -> itemMetaBuilder
                         .hideFlag(

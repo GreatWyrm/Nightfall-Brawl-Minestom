@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class BrawlGameCommand extends Command {
 
-    GameCore gameCore = GameCore.getGameCore();
+    private final GameCore gameCore = GameCore.getGameCore();
 
     public BrawlGameCommand() {
         super("brawl");
