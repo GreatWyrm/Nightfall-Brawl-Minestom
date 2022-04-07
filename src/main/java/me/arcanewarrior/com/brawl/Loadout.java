@@ -4,7 +4,7 @@ import me.arcanewarrior.com.action.items.ActionItemType;
 
 import java.util.Set;
 
-public record Loadout(Set<ActionItemType> actionItems) {
+public record Loadout(String loadoutID, Set<ActionItemType> actionItems) {
 
 
     public void applyToPlayer(BrawlPlayer player) {

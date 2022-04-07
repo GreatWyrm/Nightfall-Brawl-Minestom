@@ -3,7 +3,15 @@ package me.arcanewarrior.com.managers;
 import me.arcanewarrior.com.GameCore;
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.brawl.Loadout;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.inventory.Inventory;
+import net.minestom.server.inventory.InventoryType;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -27,8 +35,10 @@ public class LoadoutManager implements Manager {
     private final Logger logger = LoggerFactory.getLogger(LoadoutManager.class);
 
 
-    private final HashMap<String, Loadout> loadoutList = new HashMap<>();
+    // Map of Slot ID to loadout
+    private final HashMap<Integer, Loadout> loadoutList = new HashMap<>();
     private final Path loadoutFilePath =  Path.of("loadouts.yml");
+    private final Loadout defaultLoadout = new Loadout("default", EnumSet.of(ActionItemType.NYNEVE));
 
     @Override
     public void initialize() {
@@ -49,8 +59,7 @@ public class LoadoutManager implements Manager {
         try {
             CommentedConfigurationNode root = loader.load();
             for(var node : root.childrenMap().entrySet()) {
-                Loadout loadout = parseLoadout(node.getValue());
-                loadoutList.put(node.getKey().toString(), loadout);
+                parseLoadout(node.getKey().toString(), node.getValue());
             }
         } catch (ConfigurateException e) {
             e.printStackTrace();
@@ -62,9 +71,10 @@ public class LoadoutManager implements Manager {
         loadoutList.clear();
     }
 
-    private Loadout parseLoadout(CommentedConfigurationNode node) throws SerializationException {
+    private void parseLoadout(String loadoutName, CommentedConfigurationNode node) throws SerializationException {
         // Get list of action items
         EnumSet<ActionItemType> actionItems = EnumSet.noneOf(ActionItemType.class);
+        int index = -1;
         if(node.hasChild("items")) {
             for(String item : node.node("items").getList(String.class)) {
                 String enumName = item.replace("-", "_").toUpperCase(Locale.ROOT);
@@ -76,7 +86,39 @@ public class LoadoutManager implements Manager {
                 }
             }
         }
+        if(node.hasChild("index")) {
+            index = node.node("index").getInt();
+        } else {
+            logger.warn("No index specified for loadout: " + loadoutName);
+        }
+        loadoutList.put(index, new Loadout(loadoutName, actionItems));
+    }
 
-        return new Loadout(actionItems);
+    public void displayLoadoutMenu(Player brawlPlayer) {
+        Inventory inventory = new Inventory(InventoryType.CHEST_3_ROW, "Brawl Loadout");
+
+        for(var entry : loadoutList.entrySet()) {
+            int index = entry.getKey();
+            Loadout loadout = entry.getValue();
+            if(index < 0 || index >= inventory.getInventoryType().getSize()) {
+                logger.warn("Loadout " + loadout.loadoutID() + " has an invalid index!");
+            }
+            inventory.setItemStack(index, ItemStack.builder(Material.DIAMOND).displayName(Component.text(loadout.loadoutID(), NamedTextColor.AQUA)).build());
+        }
+
+        inventory.addInventoryCondition((player, slot, clickType, inventoryConditionResult) -> {
+            if(loadoutList.containsKey(slot)) {
+                //logger.info("Selected " + loadoutList.get(slot).loadoutID());
+                BrawlPlayerDataManager.getManager().modifyPlayerData(player, data -> data.setCurrentLoadout(loadoutList.get(slot)));
+                inventoryConditionResult.setCancel(true);
+                // Play "ding" sound
+            }
+        });
+
+        brawlPlayer.openInventory(inventory);
+    }
+
+    public Loadout getDefaultLoadout() {
+        return defaultLoadout;
     }
 }

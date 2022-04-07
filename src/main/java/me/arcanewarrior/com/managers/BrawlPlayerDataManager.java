@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * Class to store
@@ -83,13 +84,23 @@ public class BrawlPlayerDataManager implements Manager {
 
     private void loadDataFromStorage(UUID id) {
         loadingUUIDs.add(id);
+        // Temporary: Set as default data
+        playerDataMap.put(id, new BrawlPlayerData());
         // Async load player from storage, since we're doing file reading
+        loadingUUIDs.remove(id);
     }
 
     private void saveDataToStorage(UUID id) {
         // Async Save player to storage, since we're doing file writing
     }
 
+    /**
+     * Gets the BrawlPlayerData of a player
+     * <p>This should be only used to read from it, as it as various safety checks are built in to this function and returns default data if it cannot retrieve it</p>
+     * Use {@link #modifyPlayerData(Player, Consumer)} to edit data
+     * @param player The player to get the data for
+     * @return The player data, or default data if their data does not current exist
+     */
     public BrawlPlayerData getPlayerData(Player player) {
         UUID id = player.getUuid();
         if(unloadingUUIDs.contains(id)) {
@@ -104,6 +115,14 @@ public class BrawlPlayerDataManager implements Manager {
             logger.error("Player " + player.getUsername() + " was missing their PlayerData?!?");
             loadDataFromStorage(id);
             return DEFAULT_DATA;
+        }
+    }
+
+    public void modifyPlayerData(Player player, Consumer<BrawlPlayerData> modifierFunction) {
+        if(playerDataMap.containsKey(player.getUuid())) {
+            modifierFunction.accept(playerDataMap.get(player.getUuid()));
+        } else {
+            logger.error("Tried to modify BrawlPlayerData, but they didn't have their data loaded!");
         }
     }
 }

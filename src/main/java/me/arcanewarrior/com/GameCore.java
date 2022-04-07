@@ -8,6 +8,7 @@ import me.arcanewarrior.com.commands.CommandStarter;
 import me.arcanewarrior.com.events.MainEventListener;
 import me.arcanewarrior.com.managers.*;
 import me.arcanewarrior.com.serverbase.ServerConfig;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
