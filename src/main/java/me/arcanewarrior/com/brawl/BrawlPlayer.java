@@ -19,15 +19,9 @@ public class BrawlPlayer extends ActionPlayer {
     private final BrawlGame parentGame;
 
 
-    public BrawlPlayer(Player player, BrawlGame parent, Loadout loadout) {
+    public BrawlPlayer(Player player, BrawlGame parent) {
         super(player);
         parentGame = parent;
-
-        for(ActionItemType type : loadout.actionItems()) {
-            giveActionItemType(type);
-        }
-        // Hardcoded arrows
-        ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
     }
 
     // Random offset, to spread out various ticking things

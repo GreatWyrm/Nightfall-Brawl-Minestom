@@ -37,7 +37,6 @@ public class LoadoutManager implements Manager {
     // Map of Slot ID to loadout
     private final HashMap<Integer, Loadout> loadoutList = new HashMap<>();
     private final Path loadoutFilePath =  Path.of("loadouts.yml");
-    private final Loadout defaultLoadout = new Loadout("default", EnumSet.of(ActionItemType.NYNEVE));
 
     @Override
     public void initialize() {
@@ -85,12 +84,21 @@ public class LoadoutManager implements Manager {
                 }
             }
         }
+        // Find index: Slot position in the menu
         if(node.hasChild("index")) {
             index = node.node("index").getInt();
         } else {
             logger.warn("No index specified for loadout: " + loadoutName);
         }
-        loadoutList.put(index, new Loadout(loadoutName, actionItems));
+        // Find the name that will go on the display itemstack
+        String displayName;
+        if(node.hasChild("name")) {
+            displayName = node.node("name").getString();
+        } else {
+            logger.warn("No name specified for loadout: " + loadoutName);
+            displayName = Character.toUpperCase(loadoutName.charAt(0)) + loadoutName.substring(1);
+        }
+        loadoutList.put(index, new Loadout(loadoutName, displayName, actionItems));
     }
 
     public void displayLoadoutMenu(Player brawlPlayer) {
@@ -102,7 +110,7 @@ public class LoadoutManager implements Manager {
             if(index < 0 || index >= inventory.getInventoryType().getSize()) {
                 logger.warn("Loadout " + loadout.loadoutID() + " has an invalid index!");
             }
-            inventory.setItemStack(index, ItemStack.builder(Material.DIAMOND).displayName(Component.text(loadout.loadoutID(), NamedTextColor.AQUA)).build());
+            inventory.setItemStack(index, loadout.getLoadoutItemStack());
         }
 
         inventory.addInventoryCondition((player, slot, clickType, inventoryConditionResult) -> {
@@ -115,9 +123,5 @@ public class LoadoutManager implements Manager {
         });
 
         brawlPlayer.openInventory(inventory);
-    }
-
-    public Loadout getDefaultLoadout() {
-        return defaultLoadout;
     }
 }

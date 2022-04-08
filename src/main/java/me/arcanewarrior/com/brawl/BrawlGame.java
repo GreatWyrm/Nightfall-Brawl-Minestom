@@ -2,6 +2,7 @@ package me.arcanewarrior.com.brawl;
 
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.managers.BrawlPlayerDataManager;
+import me.arcanewarrior.com.managers.ItemManager;
 import me.arcanewarrior.com.particles.ParticleGenerator;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -77,7 +78,10 @@ public class BrawlGame {
         }
         // Get their loadout
         Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player).getCurrentLoadout();
-        brawlPlayerList.put(id, new BrawlPlayer(player, this, loadout));
+        brawlPlayerList.put(id, new BrawlPlayer(player, this));
+        loadout.applyToPlayer(brawlPlayerList.get(id));
+        // Hardcoded arrows
+        ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
     }
 
     public boolean isBrawlPlayer(Player player) {

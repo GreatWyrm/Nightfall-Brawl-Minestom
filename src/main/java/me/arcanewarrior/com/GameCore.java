@@ -38,8 +38,8 @@ public class GameCore {
         ImmutableClassToInstanceMap.Builder<Manager> builder = ImmutableClassToInstanceMap.builder();
         builder.put(WorldManager.class, new WorldManager());
         builder.put(ItemManager.class, new ItemManager());
-        builder.put(BrawlPlayerDataManager.class, new BrawlPlayerDataManager());
         builder.put(LoadoutManager.class, new LoadoutManager());
+        builder.put(BrawlPlayerDataManager.class, new BrawlPlayerDataManager());
 
         this.managers = builder.build();
 
