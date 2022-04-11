@@ -20,6 +20,8 @@ public class DamageInstance {
     private final DamageType damageType;
     /** The amount of damage to deal */
     private float damageAmount;
+    /** The total of all multipliers to this damage */
+    private float damageMultiplier = 1;
     /** The amount of fire ticks to apply */
     private int fireTicks = 0;
     /** The amount of invulnerability ticks this damage will grant */
@@ -32,10 +34,18 @@ public class DamageInstance {
     }
 
     /**
+     * Multiplies the damage by the amount
+     * @param multiplier The damage multiplier
+     */
+    public void multiplyDamage(float multiplier) {
+        damageMultiplier *= multiplier;
+    }
+
+    /**
      * Applies the damage to the target
      */
     public void applyDamage() {
-        receiver.damage(damageType, damageAmount);
+        receiver.damage(damageType, damageAmount * damageMultiplier);
         if(fireTicks > 0) {
             receiver.setFireForDuration(fireTicks * MinecraftServer.TICK_MS, ChronoUnit.MILLIS);
         }
@@ -51,5 +61,9 @@ public class DamageInstance {
 
     public void setFireTicks(int fireTicks) {
         this.fireTicks = fireTicks;
+    }
+
+    public DamageType getDamageType() {
+        return damageType;
     }
 }

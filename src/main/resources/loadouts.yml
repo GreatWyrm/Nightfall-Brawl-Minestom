@@ -5,3 +5,10 @@ velvetine:
     - "nyneve"
     - "pyrrhic"
     - "horn"
+
+tui:
+  index: 1
+  name: Tui
+  items:
+    - "kindled-light"
+    - "wildfire"

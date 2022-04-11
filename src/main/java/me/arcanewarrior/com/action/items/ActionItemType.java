@@ -12,6 +12,8 @@ public enum ActionItemType {
     NYNEVE(Nyneve::new),
     PYRRHIC(Pyrrhic::new),
     HORN(Horn::new),
+    KINDLED_LIGHT(KindledLight::new),
+    WILDFIRE(Wildfire::new),
 
     ;
 
