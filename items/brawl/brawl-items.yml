@@ -5,6 +5,9 @@ nyneve:
     - attribute: "attack_damage"
       amount: 15
   lore: "Arcane's First Action Item"
+  actions:
+    left: "Hit things"
+    right: "Runedash forward"
   base-kb: 35
   scaling-kb: 10
 

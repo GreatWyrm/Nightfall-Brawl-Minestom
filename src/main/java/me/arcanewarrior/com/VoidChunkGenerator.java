@@ -1,17 +1,14 @@
 package me.arcanewarrior.com;
 
-import net.minestom.server.instance.ChunkGenerator;
-import net.minestom.server.instance.ChunkPopulator;
-import net.minestom.server.instance.batch.ChunkBatch;
+import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.generator.GenerationUnit;
+import net.minestom.server.instance.generator.Generator;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.world.biomes.Biome;
 import net.minestom.server.world.biomes.BiomeEffects;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-public class VoidChunkGenerator implements ChunkGenerator {
+public class VoidChunkGenerator implements Generator {
 
     private static final BiomeEffects VOID_EFFECTS = BiomeEffects.builder()
             .fogColor(0x2C2F33)
@@ -31,12 +28,8 @@ public class VoidChunkGenerator implements ChunkGenerator {
             .build();
 
     @Override
-    public void generateChunkData(@NotNull ChunkBatch batch, int chunkX, int chunkZ) {
-
-    }
-
-    @Override
-    public @Nullable List<ChunkPopulator> getPopulators() {
-        return null;
+    public void generate(@NotNull GenerationUnit unit) {
+        unit.modifier().fill(Block.AIR);
+        unit.modifier().fillBiome(VOID);
     }
 }

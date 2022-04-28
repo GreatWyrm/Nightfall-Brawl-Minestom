@@ -13,11 +13,12 @@ public class BrawlItemLoader extends ItemLoader {
         // After loading in base, check and apply NBT tags
         double baseKB = node.node("base-kb").getDouble(10);
         double scalingKB = node.node("scaling-kb").getDouble(2);
+        // Apply abilities
+
 
         return base.withMeta(meta -> {
             meta.setTag(Tag.Double(BrawlTags.NBT_BASE_KNOCKBACK_KEY), baseKB);
             meta.setTag(Tag.Double(BrawlTags.NBT_SCALING_KNOCKBACK_KEY), scalingKB);
-            return meta;
         });
     }
 }

@@ -7,8 +7,10 @@ import me.arcanewarrior.com.brawl.BrawlGame;
 import me.arcanewarrior.com.commands.CommandStarter;
 import me.arcanewarrior.com.events.MainEventListener;
 import me.arcanewarrior.com.managers.*;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.adventure.audience.Audiences;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -56,8 +58,6 @@ public class GameCore {
         });
 
 
-
-
         MainEventListener listener = new MainEventListener(this);
         listener.registerAllEvents();
 
@@ -89,7 +89,7 @@ public class GameCore {
 
     public Set<String> getBrawlPlayerNames() {
         if(currentBrawlGame != null) {
-            return currentBrawlGame.getSetOfNames();
+            return currentBrawlGame.getListOfNames();
         } else {
             return new HashSet<>();
         }
@@ -123,8 +123,8 @@ public class GameCore {
     }
 
     public void giveActionItem(UUID uuid, ActionItemType type) {
-        if(currentBrawlGame != null) {
-            currentBrawlGame.giveActionItem(uuid, type);
+        if(currentBrawlGame != null && currentBrawlGame.isBrawlPlayer(uuid)) {
+            currentBrawlGame.getBrawlPlayer(uuid).giveActionItemType(type);
         }
     }
 
@@ -133,8 +133,8 @@ public class GameCore {
     }
 
     public void removeActionItem(UUID uuid, ActionItemType type) {
-        if(currentBrawlGame != null) {
-            currentBrawlGame.removeActionItem(uuid, type);
+        if(currentBrawlGame != null && currentBrawlGame.isBrawlPlayer(uuid)) {
+            currentBrawlGame.getBrawlPlayer(uuid).removeActionItemType(type);
         }
     }
 
@@ -145,9 +145,6 @@ public class GameCore {
     }
 
     public void broadcastMessage(Component text) {
-        ChatMessagePacket packet = new ChatMessagePacket(text, ChatPosition.CHAT, UUID.randomUUID());
-        for(var player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
-            player.sendPacket(packet);
-        }
+        Audiences.players().sendMessage(text);
     }
 }

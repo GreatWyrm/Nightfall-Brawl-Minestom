@@ -1,6 +1,7 @@
 package me.arcanewarrior.com.items;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.KeybindComponent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.attribute.Attribute;
@@ -85,6 +86,25 @@ public class ItemLoader {
         int customModelData = modelDataNode.getInt(0);
 
         ArrayList<Component> lore = new ArrayList<>();
+        // Apply keybinds (under the actions option)
+        // For further keybind translations: https://minecraft.fandom.com/wiki/Controls
+        CommentedConfigurationNode actionsNode = node.node("actions");
+        if(actionsNode != null) {
+            // Check for each keybind
+            if(actionsNode.hasChild("left")) {
+                lore.add(
+                        Component.keybind("key.attack", Style.style(formatStyle.getLeftClickColor(), TextDecoration.ITALIC.withState(false)))
+                                .append(Component.text(" - " + actionsNode.node("left").getString(), Style.style(formatStyle.getLeftClickColor(), TextDecoration.ITALIC.withState(false))))
+                );
+            }
+            if(actionsNode.hasChild("right")) {
+                lore.add(
+                        Component.keybind("key.use", Style.style(formatStyle.getRightClickColor(), TextDecoration.ITALIC.withState(false)))
+                                .append(Component.text(" - " + actionsNode.node("right").getString(), Style.style(formatStyle.getRightClickColor(), TextDecoration.ITALIC.withState(false))))
+                );
+            }
+        }
+        lore.add(Component.empty());
         CommentedConfigurationNode loreNode = node.node("lore");
         String loreLines = loreNode.getString("default");
         if (loreLines != null) {

@@ -80,8 +80,10 @@ public class ItemManager implements Manager {
      * @return True if the item was added to the inventory, false if it could not be added (usually when the inventory is full)
      */
     public boolean giveItemToPlayer(String name, int amount, Player player) {
-        ItemStack stack = getItem(name, amount);
-        return player.getInventory().addItemStack(stack);
+        if(doesItemExist(name)) {
+            return player.getInventory().addItemStack(getItem(name, amount));
+        }
+        return false;
     }
 
     /**
@@ -93,6 +95,10 @@ public class ItemManager implements Manager {
     public void forceGiveItemToPlayer(String name, int amount, Player player) {
         ItemStack stack = getItem(name, amount);
         player.getInventory().processItemStack(stack, TransactionType.ADD, TransactionOption.ALL);
+    }
+
+    public boolean doesItemExist(String name) {
+        return itemList.containsKey(name);
     }
 
     @Override

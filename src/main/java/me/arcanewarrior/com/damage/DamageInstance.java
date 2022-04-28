@@ -3,6 +3,8 @@ package me.arcanewarrior.com.damage;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.entity.damage.EntityDamage;
+import net.minestom.server.entity.damage.EntityProjectileDamage;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.temporal.ChronoUnit;
@@ -48,6 +50,12 @@ public class DamageInstance {
         receiver.damage(damageType, damageAmount * damageMultiplier);
         if(fireTicks > 0) {
             receiver.setFireForDuration(fireTicks * MinecraftServer.TICK_MS, ChronoUnit.MILLIS);
+        }
+        if(damageType instanceof EntityDamage damage) {
+            receiver.takeKnockback(0.4f, Math.sin(damage.getSource().getPosition().yaw() * Math.PI / 180), -Math.cos(damage.getSource().getPosition().yaw() * Math.PI / 180));
+        }
+        if(damageType instanceof EntityProjectileDamage damage) {
+            receiver.takeKnockback(0.4f, Math.sin(damage.getProjectile().getPosition().yaw() * Math.PI / 180), -Math.cos(damage.getProjectile().getPosition().yaw() * Math.PI / 180));
         }
     }
 

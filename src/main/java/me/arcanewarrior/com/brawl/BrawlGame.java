@@ -1,10 +1,10 @@
 package me.arcanewarrior.com.brawl;
 
-import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.managers.BrawlPlayerDataManager;
 import me.arcanewarrior.com.managers.ItemManager;
 import me.arcanewarrior.com.particles.ParticleGenerator;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -13,6 +13,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.WorldBorder;
 import net.minestom.server.particle.Particle;
+import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.Nullable;
@@ -25,84 +26,40 @@ import java.util.stream.Collectors;
 
 public class BrawlGame {
 
-
-    private final Task updateBrawlPlayers;
-    private final BrawlEvents events;
+    // ---- World/Position Variables
     private final Instance brawlWorld;
     private final Pos centerPos = new Pos(242, 39, 1348);
-
-    private int tickCounter = 0;
-
     private final double BORDER_RADIUS = 40;
     // Calculated from = Half of the border radius, subtract 0.3, since border will stop you 0.3 blocks earlier if it's on an exact block boundry, and then 0.02 earlier for an epsilon value
     private final double BLAST_LINE_BOUNDRY = BORDER_RADIUS/2 - 0.3 - 0.02;
 
-    // TODO: Add upper and lower blast lines, use https://wiki.vg/Plugin_channels#minecraft:debug.2Fgame_test_add_marker as markers
+    // Events/Ticking
+    private Task updateBrawlPlayers;
+    private final BrawlEvents events;
+    private int tickCounter = 0;
 
+
+    // TODO: Add upper and lower blast lines, use https://wiki.vg/Plugin_channels#minecraft:debug.2Fgame_test_add_marker as markers
+    private final Sidebar brawlSidebar = new Sidebar(Component.text("Nightfall Brawl", NamedTextColor.AQUA));
+    private BrawlGameSettings gameSettings = new BrawlGameSettings(3, 180);
+    private BrawlGameState brawlGameState = BrawlGameState.LOBBY;
+    // Player list
+    private final Map<UUID, BrawlPlayer> brawlPlayerList = new HashMap<>();
+
+    // Initialization
     public BrawlGame(Instance worldInstance) {
-        updateBrawlPlayers = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
-            for(BrawlPlayer player : brawlPlayerList.values()) {
-                player.update();
-                // Check if colliding with world border (blast lines)
-                if(isInBlastLines(player)) {
-                    playerKnockout(player);
-                }
-            }
-            tickCounter++;
-        }, TaskSchedule.seconds(1), TaskSchedule.tick(1));
-        // Above, start immediately, run once per tick
         events = new BrawlEvents(this, MinecraftServer.getGlobalEventHandler());
         events.registerEvents();
         brawlWorld = worldInstance;
         setupWorldBorder();
     }
 
-    private final Map<UUID, BrawlPlayer> brawlPlayerList = new HashMap<>();
-
-    public Set<String> getSetOfNames() {
+    public Set<String> getListOfNames() {
         return brawlPlayerList.values().stream().map(player -> player.getPlayer().getUsername()).collect(Collectors.toSet());
     }
 
-    public @Nullable BrawlPlayer getBrawlPlayer(UUID uuid) {
-        return brawlPlayerList.get(uuid);
-    }
-
-    public @Nullable BrawlPlayer getBrawlPlayer(Entity entity) {
-        return getBrawlPlayer(entity.getUuid());
-    }
-
-    public void addBrawlPlayer(Player player) {
-        UUID id = player.getUuid();
-        if(brawlPlayerList.containsKey(id)) {
-            throw new IllegalStateException("Cannot add player " + player.getName() + " to the Brawl Player List List, as they are already in it!");
-        }
-        // Get their loadout
-        Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player).getCurrentLoadout();
-        brawlPlayerList.put(id, new BrawlPlayer(player, this));
-        loadout.applyToPlayer(brawlPlayerList.get(id));
-        // Hardcoded arrows
-        ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
-    }
-
-    public boolean isBrawlPlayer(Player player) {
-        return brawlPlayerList.containsKey(player.getUuid());
-    }
-
-    public void giveActionItem(UUID id, ActionItemType type) {
-        if(brawlPlayerList.containsKey(id)) {
-            brawlPlayerList.get(id).giveActionItemType(type);
-        }
-    }
-
-    public void removeActionItem(UUID id, ActionItemType type) {
-        if(brawlPlayerList.containsKey(id)) {
-            brawlPlayerList.get(id).removeActionItemType(type);
-        }
-    }
-
-
-    public void removeBrawlPlayer(Player player) {
-        brawlPlayerList.remove(player.getUuid());
+    public boolean canPlayerMove(Player player) {
+        return isBrawlPlayer(player) && brawlGameState != BrawlGameState.COUNTDOWN;
     }
 
     public int getTickCount() {
@@ -119,6 +76,55 @@ public class BrawlGame {
         for(BrawlPlayer player : brawlPlayerList.values()) {
             player.getPlayer().setInstance(brawlWorld, centerPos);
         }
+    }
+
+    // ---- GAME STATE CHANGES ----
+
+    public void startGame() {
+        updateBrawlPlayers = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            for(BrawlPlayer player : brawlPlayerList.values()) {
+                player.update();
+                // Check if colliding with world border (blast lines)
+                if(isInBlastLines(player)) {
+                    playerKnockout(player);
+                }
+            }
+            tickCounter++;
+        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+        warpAllToCenter();
+    }
+
+    // ----- BRAWL PLAYER ADD/REMOVE/ACCESS -----
+
+    public boolean isBrawlPlayer(Player player) {
+        return brawlPlayerList.containsKey(player.getUuid());
+    }
+    public boolean isBrawlPlayer(UUID id) {
+        return brawlPlayerList.containsKey(id);
+    }
+    public @Nullable BrawlPlayer getBrawlPlayer(UUID uuid) {
+        return brawlPlayerList.get(uuid);
+    }
+
+    public @Nullable BrawlPlayer getBrawlPlayer(Entity entity) {
+        return getBrawlPlayer(entity.getUuid());
+    }
+    public void addBrawlPlayer(Player player) {
+        UUID id = player.getUuid();
+        if(brawlPlayerList.containsKey(id)) {
+            throw new IllegalStateException("Cannot add player " + player.getName() + " to the Brawl Player List List, as they are already in it!");
+        }
+        // Get their loadout
+        Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player).getCurrentLoadout();
+        brawlPlayerList.put(id, new BrawlPlayer(player, this));
+        loadout.applyToPlayer(brawlPlayerList.get(id));
+        brawlSidebar.addViewer(player);
+        // Hardcoded arrows
+        ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
+    }
+    public void removeBrawlPlayer(Player player) {
+        brawlPlayerList.remove(player.getUuid());
+        brawlSidebar.removeViewer(player);
     }
 
     // ----- KNOCKOUTS -----
@@ -162,20 +168,17 @@ public class BrawlGame {
     }
 
     public void broadcastToPlayers(Component message) {
-        for(BrawlPlayer player : brawlPlayerList.values()) {
-            player.sendMessage(message);
-        }
+        brawlSidebar.sendMessage(message);
     }
-
-    public void broadcastToPlayers(String message) {
-        broadcastToPlayers(Component.text(message));
-    }
-
 
     /**
      * Stops the current brawl game, cleaning up any variables that may have been initialized
      */
     public void stop() {
+        for(BrawlPlayer player : brawlPlayerList.values()) {
+            // player.reset(); - Doesn't currently exist yet
+            brawlSidebar.removeViewer(player.getPlayer());
+        }
         updateBrawlPlayers.cancel();
         events.unregisterEvents();
     }

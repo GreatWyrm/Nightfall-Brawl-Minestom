@@ -12,6 +12,7 @@ import net.minestom.server.event.entity.EntityShootEvent;
 import net.minestom.server.event.item.ItemUpdateStateEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.event.player.PlayerItemAnimationEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.EntityEvent;
 import net.minestom.server.item.ItemStack;
@@ -107,6 +108,11 @@ public class BrawlEvents {
                 }
                 event.setDamage(0);
             }
+        });
+        node.addListener(PlayerMoveEvent.class, event -> {
+           if(parentGame.canPlayerMove(event.getPlayer())) {
+               event.setCancelled(true);
+           }
         });
         eventHandler.addChild(node);
     }

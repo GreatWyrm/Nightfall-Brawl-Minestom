@@ -3,14 +3,18 @@ package me.arcanewarrior.com.managers;
 import me.arcanewarrior.com.GameCore;
 import me.arcanewarrior.com.VoidChunkGenerator;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.*;
 import net.minestom.server.instance.batch.ChunkBatch;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.generator.GenerationUnit;
+import net.minestom.server.instance.generator.Generator;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jglrxavpok.hephaistos.nbt.NBT;
 import org.jglrxavpok.hephaistos.nbt.NBTCompound;
 import org.jglrxavpok.hephaistos.nbt.mutable.MutableNBTCompound;
 
@@ -23,7 +27,7 @@ public class WorldManager implements Manager {
 
     public static WorldManager getManager() { return GameCore.getGameCore().getManager(WorldManager.class); }
 
-    private static final Map<String, InstanceContainer> worldList = new HashMap<>();
+    private final Map<String, InstanceContainer> worldList = new HashMap<>();
 
     private static final Pos DEFAULT_WORLD_SPAWN_POS = new Pos(0, 42, 0);
     private static final String DEFAULT_WORLD_NAME = "default";
@@ -46,9 +50,8 @@ public class WorldManager implements Manager {
         InstanceContainer newWorld = MinecraftServer.getInstanceManager().createInstanceContainer(loader);
         // Required for loading in the level.dat file information
         loader.loadInstance(newWorld);
-        newWorld.setChunkGenerator(new VoidChunkGenerator());
+        newWorld.setGenerator(new VoidChunkGenerator());
         worldList.put(path, newWorld);
-        getWorldSpawnPoint(path);
     }
 
     public void unloadMinecraftWorld(String worldName, boolean save) {
@@ -77,7 +80,7 @@ public class WorldManager implements Manager {
         if(!doesWorldExist(worldName)) return null;
 
         InstanceContainer world = worldList.get(worldName);
-        NBTCompound worldLevelDat = world.getTag(Tag.NBT("Data"));
+        NBTCompound worldLevelDat = (NBTCompound) world.getTag(Tag.NBT("Data"));
         int x = 0;
         int y = 0;
         int z = 0;
@@ -99,7 +102,7 @@ public class WorldManager implements Manager {
         }
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
-        instanceContainer.setChunkGenerator(new BasicChunkGenerator());
+        instanceContainer.setGenerator(new BasicChunkGenerator());
         // Set NBT Tag for proper teleporting
         MutableNBTCompound data = new MutableNBTCompound();
         data.setInt("SpawnX", 0);
@@ -131,30 +134,25 @@ public class WorldManager implements Manager {
         getDefaultWorld().saveChunksToStorage();
     }
 
-    private static class BasicChunkGenerator implements ChunkGenerator {
-
+    private static class BasicChunkGenerator implements Generator {
         @Override
-        public void generateChunkData(@NotNull ChunkBatch batch, int chunkX, int chunkZ) {
-            for(byte x = 0; x < Chunk.CHUNK_SIZE_X; x++) {
-                for(byte y = 0; y < 40; y++) {
-                    for(byte z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
+        public void generate(@NotNull GenerationUnit unit) {
+            Point size = unit.size();
+            for (int x = 0; x < size.blockX(); x++) {
+                for(int y = 0; y < size.blockY(); y++) {
+                    for (int z = 0; z < size.blockZ(); z++) {
                         if((x + z) % 7 == 0) {
-                            batch.setBlock(x, y, z, Block.HAY_BLOCK);
+                            unit.modifier().setBlock(x, y, z, Block.HAY_BLOCK);
                         } else if(x % 8 == 0) {
-                            batch.setBlock(x, y, z, Block.AMETHYST_BLOCK);
+                            unit.modifier().setBlock(x, y, z, Block.AMETHYST_BLOCK);
                         } else if(x % 4 == 0) {
-                            batch.setBlock(x, y, z, Block.BONE_BLOCK);
+                            unit.modifier().setBlock(x, y, z, Block.BONE_BLOCK);
                         } else {
-                            batch.setBlock(x, y, z, Block.STONE);
+                            unit.modifier().setBlock(x, y, z, Block.STONE);
                         }
                     }
                 }
             }
-        }
-
-        @Override
-        public @Nullable List<ChunkPopulator> getPopulators() {
-            return null;
         }
     }
 
