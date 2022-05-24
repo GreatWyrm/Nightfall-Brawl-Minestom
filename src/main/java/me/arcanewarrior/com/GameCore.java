@@ -7,7 +7,6 @@ import me.arcanewarrior.com.brawl.BrawlGame;
 import me.arcanewarrior.com.commands.CommandStarter;
 import me.arcanewarrior.com.events.MainEventListener;
 import me.arcanewarrior.com.managers.*;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.adventure.audience.Audiences;
@@ -15,8 +14,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerLoginEvent;
-import net.minestom.server.message.ChatPosition;
-import net.minestom.server.network.packet.server.play.ChatMessagePacket;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +37,7 @@ public class GameCore {
         ImmutableClassToInstanceMap.Builder<Manager> builder = ImmutableClassToInstanceMap.builder();
         builder.put(WorldManager.class, new WorldManager());
         builder.put(ItemManager.class, new ItemManager());
+        builder.put(SkinManager.class, new SkinManager());
         builder.put(LoadoutManager.class, new LoadoutManager());
         builder.put(BrawlPlayerDataManager.class, new BrawlPlayerDataManager());
 

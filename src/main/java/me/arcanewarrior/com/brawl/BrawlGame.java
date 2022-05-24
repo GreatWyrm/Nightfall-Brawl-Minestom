@@ -17,11 +17,10 @@ import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BrawlGame {
@@ -42,9 +41,11 @@ public class BrawlGame {
     // TODO: Add upper and lower blast lines, use https://wiki.vg/Plugin_channels#minecraft:debug.2Fgame_test_add_marker as markers
     private final Sidebar brawlSidebar = new Sidebar(Component.text("Nightfall Brawl", NamedTextColor.AQUA));
     private BrawlGameSettings gameSettings = new BrawlGameSettings(3, 180);
-    private BrawlGameState brawlGameState = BrawlGameState.LOBBY;
+    private GameState gameState = GameState.LOBBY;
     // Player list
     private final Map<UUID, BrawlPlayer> brawlPlayerList = new HashMap<>();
+
+    private final Logger logger = LoggerFactory.getLogger(BrawlGame.class);
 
     // Initialization
     public BrawlGame(Instance worldInstance) {
@@ -52,6 +53,7 @@ public class BrawlGame {
         events.registerEvents();
         brawlWorld = worldInstance;
         setupWorldBorder();
+        brawlSidebar.createLine(new Sidebar.ScoreboardLine("state", Component.text(gameState.name()), 1));
     }
 
     public Set<String> getListOfNames() {
@@ -59,7 +61,7 @@ public class BrawlGame {
     }
 
     public boolean canPlayerMove(Player player) {
-        return isBrawlPlayer(player) && brawlGameState != BrawlGameState.COUNTDOWN;
+        return isBrawlPlayer(player) && gameState != GameState.COUNTDOWN;
     }
 
     public int getTickCount() {
@@ -112,7 +114,8 @@ public class BrawlGame {
     public void addBrawlPlayer(Player player) {
         UUID id = player.getUuid();
         if(brawlPlayerList.containsKey(id)) {
-            throw new IllegalStateException("Cannot add player " + player.getName() + " to the Brawl Player List List, as they are already in it!");
+            logger.warn("Attempted to add player " + player.getName() + " to the Brawl Player List List, but they are already in it!");
+            return;
         }
         // Get their loadout
         Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player).getCurrentLoadout();
@@ -169,6 +172,30 @@ public class BrawlGame {
 
     public void broadcastToPlayers(Component message) {
         brawlSidebar.sendMessage(message);
+    }
+
+    // LOBBY
+
+    private final Set<Player> lobbyPlayers = new HashSet<>();
+
+    private void addLobbyPlayer() {
+
+    }
+
+
+
+    // GAME STATE
+
+    public void transitionToState(GameState state) {
+        var requiredState = state.previousState();
+
+        if(gameState == requiredState) {
+            gameState = state;
+            brawlSidebar.updateLineContent("state", Component.text(gameState.name()));
+            state.onTransitionTo(this);
+        } else {
+            logger.warn("Attempted to change to state " + state.name() + ", but current state is " + gameState.name() + "!");
+        }
     }
 
     /**

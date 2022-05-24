@@ -50,7 +50,7 @@ public class GamemodeCommand extends Command {
                             // Return display name if not null
                             .append(other.getDisplayName() == null ? Component.text(other.getUsername(), NamedTextColor.AQUA) : other.getDisplayName())
                             .append(Component.text("'s gamemode to ", NamedTextColor.GREEN))
-                            .append(Component.text(mode.name(), NamedTextColor.YELLOW)), MessageType.SYSTEM);
+                            .append(Component.text(mode.name(), NamedTextColor.YELLOW)));
                 }
             }
         }, gamemode, players);

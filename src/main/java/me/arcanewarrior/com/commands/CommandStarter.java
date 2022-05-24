@@ -21,6 +21,7 @@ public class CommandStarter {
         manager.register(new KillCommand());
         manager.register(new EffectCommand());
         manager.register(new LoadoutCommand());
+        manager.register(new SkinCommand());
 
         LOGGER.debug("Finished Initializing Commands.");
     }

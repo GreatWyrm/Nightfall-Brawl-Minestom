@@ -1,6 +1,7 @@
 velvetine:
   index: 0
   name: Velvetine
+  skin: velvetine
   items:
     - "nyneve"
     - "pyrrhic"
@@ -9,6 +10,7 @@ velvetine:
 tui:
   index: 1
   name: Tui
+  skin: tui
   items:
     - "kindled-light"
     - "wildfire"

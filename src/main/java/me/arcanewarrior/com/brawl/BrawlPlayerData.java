@@ -11,7 +11,7 @@ public class BrawlPlayerData {
 
     public BrawlPlayerData() {
         this.gamesPlayed = 0;
-        this.currentLoadout = new Loadout("default", "Default", EnumSet.of(ActionItemType.NYNEVE));;
+        this.currentLoadout = new Loadout("default", "Default", null, EnumSet.of(ActionItemType.NYNEVE));
     }
 
     public void setCurrentLoadout(Loadout loadout) {

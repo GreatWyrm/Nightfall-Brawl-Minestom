@@ -3,10 +3,12 @@ package me.arcanewarrior.com.managers;
 import me.arcanewarrior.com.GameCore;
 import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.brawl.Loadout;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
+import net.minestom.server.sound.SoundEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -94,7 +96,14 @@ public class LoadoutManager implements Manager {
             logger.warn("No name specified for loadout: " + loadoutName);
             displayName = Character.toUpperCase(loadoutName.charAt(0)) + loadoutName.substring(1);
         }
-        loadoutList.put(index, new Loadout(loadoutName, displayName, actionItems));
+        String skinName;
+        if(node.hasChild("skin")) {
+            skinName = node.node("skin").getString();
+        } else {
+            logger.warn("No skin specified for loadout: " + loadoutName);
+            skinName = null;
+        }
+        loadoutList.put(index, new Loadout(loadoutName, displayName, skinName, actionItems));
     }
 
     public void displayLoadoutMenu(Player brawlPlayer) {
@@ -111,10 +120,9 @@ public class LoadoutManager implements Manager {
 
         inventory.addInventoryCondition((player, slot, clickType, inventoryConditionResult) -> {
             if(loadoutList.containsKey(slot)) {
-                //logger.info("Selected " + loadoutList.get(slot).loadoutID());
                 BrawlPlayerDataManager.getManager().modifyPlayerData(player, data -> data.setCurrentLoadout(loadoutList.get(slot)));
+                player.playSound(Sound.sound(SoundEvent.BLOCK_NOTE_BLOCK_PLING, Sound.Source.MASTER, 1f, 1.5f), Sound.Emitter.self());
                 inventoryConditionResult.setCancel(true);
-                // Play "ding" sound
             }
         });
 

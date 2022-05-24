@@ -1,22 +1,24 @@
 package me.arcanewarrior.com.items;
 
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public enum ItemFormatStyle {
 
-    DEFAULT(NamedTextColor.AQUA, NamedTextColor.AQUA, NamedTextColor.DARK_AQUA, NamedTextColor.BLUE)
+    DEFAULT(NamedTextColor.AQUA, Style.style(NamedTextColor.AQUA, TextDecoration.ITALIC.withState(false)), NamedTextColor.DARK_AQUA, NamedTextColor.BLUE)
     ;
 
 
     private final TextColor nameColor;
-    private final TextColor loreColor;
+    private final Style loreStyle;
     private final TextColor leftClickColor;
     private final TextColor rightClickColor;
 
-    ItemFormatStyle(TextColor color, TextColor loreColor, TextColor leftClickColor, TextColor rightClickColor) {
+    ItemFormatStyle(TextColor color, Style loreStyle, TextColor leftClickColor, TextColor rightClickColor) {
         this.nameColor = color;
-        this.loreColor = loreColor;
+        this.loreStyle = loreStyle;
         this.leftClickColor = leftClickColor;
         this.rightClickColor = rightClickColor;
     }
@@ -25,7 +27,7 @@ public enum ItemFormatStyle {
         return nameColor;
     }
 
-    public TextColor getLoreColor() { return loreColor; }
+    public Style getLoreStyle() { return loreStyle; }
 
     public TextColor getLeftClickColor() {
         return leftClickColor;

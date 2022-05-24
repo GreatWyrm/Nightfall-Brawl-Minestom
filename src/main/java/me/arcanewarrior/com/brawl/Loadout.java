@@ -1,6 +1,7 @@
 package me.arcanewarrior.com.brawl;
 
 import me.arcanewarrior.com.action.items.ActionItemType;
+import me.arcanewarrior.com.managers.SkinManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -10,11 +11,14 @@ import net.minestom.server.item.Material;
 import java.util.ArrayList;
 import java.util.Set;
 
-public record Loadout(String loadoutID, String displayName, Set<ActionItemType> actionItems) {
+public record Loadout(String loadoutID, String displayName, String skinname, Set<ActionItemType> actionItems) {
 
     public void applyToPlayer(BrawlPlayer player) {
         for(ActionItemType type : actionItems) {
             player.giveActionItemType(type);
+        }
+        if(skinname != null) {
+            SkinManager.getManager().setSkin(player, skinname);
         }
     }
 

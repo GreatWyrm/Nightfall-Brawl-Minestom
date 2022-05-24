@@ -1,7 +1,6 @@
 package me.arcanewarrior.com.items;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.KeybindComponent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.attribute.Attribute;
@@ -109,7 +108,7 @@ public class ItemLoader {
         String loreLines = loreNode.getString("default");
         if (loreLines != null) {
             for(String line : loreLines.split("\n")) {
-                lore.add(Component.text(line, Style.style(formatStyle.getLoreColor(), TextDecoration.ITALIC.withState(false))));
+                lore.add(Component.text(line, formatStyle.getLoreStyle()));
             }
         }
 
