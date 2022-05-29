@@ -9,6 +9,10 @@ import java.util.function.Function;
 public enum ActionItemType {
 
 
+    // Lobby Items
+    OPEN_KIT_MENU(OpenKitMenu::new),
+    READY_ITEM(ReadyItem::new),
+
     NYNEVE(Nyneve::new),
     PYRRHIC(Pyrrhic::new),
     HORN(Horn::new),

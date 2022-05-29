@@ -59,6 +59,7 @@ public class GameCore {
         MainEventListener listener = new MainEventListener(this);
         listener.registerAllEvents();
 
+        createNewBrawlGame();
     }
 
     public <S extends Manager> S getManager(Class<S> managerClass) {
@@ -110,10 +111,10 @@ public class GameCore {
     }
 
     public void stop() {
-        managers.values().forEach(Manager::stop);
         if(currentBrawlGame != null) {
             currentBrawlGame.stop();
         }
+        managers.values().forEach(Manager::stop);
     }
 
     public void giveActionItem(Player player, ActionItemType type) {

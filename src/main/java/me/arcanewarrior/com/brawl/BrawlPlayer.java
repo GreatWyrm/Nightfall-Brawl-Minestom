@@ -114,7 +114,12 @@ public class BrawlPlayer extends ActionPlayer {
         }
     }
 
-    public float getYaw() {
-        return player.getPosition().yaw();
+    public void toggleReadyState() {
+        parentGame.toggleReadyState(this);
+    }
+
+    public void reset() {
+        player.getInventory().clear();
+        clearActionInventory();
     }
 }

@@ -108,6 +108,10 @@ public class ActionPlayer {
         actionItemInventory.removeFromInventory(type);
     }
 
+    public void clearActionInventory() {
+        actionItemInventory.clear();
+    }
+
     // ---- Position ----
 
     public Instance getInstance() {

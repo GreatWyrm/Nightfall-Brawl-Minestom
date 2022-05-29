@@ -54,4 +54,8 @@ public class ActionInventory {
             item.update();
         }
     }
+
+    public void clear() {
+        items.clear();
+    }
 }

@@ -95,6 +95,10 @@ public class WorldManager implements Manager {
         return new Pos(x, y, z);
     }
 
+    public @NotNull Pos getDefaultWorldSpawnPos() {
+        return DEFAULT_WORLD_SPAWN_POS;
+    }
+
     private void createDefaultWorld() {
         if(!worldList.isEmpty()) {
             MinecraftServer.LOGGER.warn("WorldList not empty when creating the default world?!?!");

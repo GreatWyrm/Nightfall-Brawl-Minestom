@@ -106,7 +106,7 @@ public class LoadoutManager implements Manager {
         loadoutList.put(index, new Loadout(loadoutName, displayName, skinName, actionItems));
     }
 
-    public void displayLoadoutMenu(Player brawlPlayer) {
+    public void displayLoadoutMenu(Player player) {
         Inventory inventory = new Inventory(InventoryType.CHEST_3_ROW, "Brawl Loadout");
 
         for(var entry : loadoutList.entrySet()) {
@@ -118,14 +118,14 @@ public class LoadoutManager implements Manager {
             inventory.setItemStack(index, loadout.getLoadoutItemStack());
         }
 
-        inventory.addInventoryCondition((player, slot, clickType, inventoryConditionResult) -> {
+        inventory.addInventoryCondition((p, slot, clickType, inventoryConditionResult) -> {
             if(loadoutList.containsKey(slot)) {
-                BrawlPlayerDataManager.getManager().modifyPlayerData(player, data -> data.setCurrentLoadout(loadoutList.get(slot)));
-                player.playSound(Sound.sound(SoundEvent.BLOCK_NOTE_BLOCK_PLING, Sound.Source.MASTER, 1f, 1.5f), Sound.Emitter.self());
+                BrawlPlayerDataManager.getManager().modifyPlayerData(p, data -> data.setCurrentLoadout(loadoutList.get(slot)));
+                p.playSound(Sound.sound(SoundEvent.BLOCK_NOTE_BLOCK_PLING, Sound.Source.MASTER, 1f, 1.5f), Sound.Emitter.self());
                 inventoryConditionResult.setCancel(true);
             }
         });
 
-        brawlPlayer.openInventory(inventory);
+        player.openInventory(inventory);
     }
 }

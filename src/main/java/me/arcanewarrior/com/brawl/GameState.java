@@ -15,10 +15,4 @@ public enum GameState {
             return values()[ord-1];
         }
     }
-
-    public void onTransitionTo(BrawlGame game) {
-        switch (this) {
-            case GAME -> game.startGame();
-        }
-    }
 }

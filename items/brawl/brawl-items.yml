@@ -1,3 +1,16 @@
+# Lobby Items
+
+open-loadout-menu:
+  material: diamond
+  name: "Open Loadout Menu"
+  lore: "Open the menu"
+
+ready-item:
+  material: emerald
+  name: Ready Up
+  lore: "Ready up"
+
+
 nyneve:
   material: "diamond_sword"
   name: Nyneve

@@ -1,10 +1,16 @@
 package me.arcanewarrior.com.brawl;
 
+import me.arcanewarrior.com.GameCore;
+import me.arcanewarrior.com.action.items.ActionItemType;
 import me.arcanewarrior.com.managers.BrawlPlayerDataManager;
 import me.arcanewarrior.com.managers.ItemManager;
+import me.arcanewarrior.com.managers.WorldManager;
 import me.arcanewarrior.com.particles.ParticleGenerator;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -14,6 +20,7 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.WorldBorder;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.scoreboard.Sidebar;
+import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class BrawlGame {
@@ -34,6 +42,7 @@ public class BrawlGame {
 
     // Events/Ticking
     private Task updateBrawlPlayers;
+    private Task countdown;
     private final BrawlEvents events;
     private int tickCounter = 0;
 
@@ -44,6 +53,7 @@ public class BrawlGame {
     private GameState gameState = GameState.LOBBY;
     // Player list
     private final Map<UUID, BrawlPlayer> brawlPlayerList = new HashMap<>();
+    private final Set<UUID> readyPlayerList = new HashSet<>();
 
     private final Logger logger = LoggerFactory.getLogger(BrawlGame.class);
 
@@ -58,10 +68,6 @@ public class BrawlGame {
 
     public Set<String> getListOfNames() {
         return brawlPlayerList.values().stream().map(player -> player.getPlayer().getUsername()).collect(Collectors.toSet());
-    }
-
-    public boolean canPlayerMove(Player player) {
-        return isBrawlPlayer(player) && gameState != GameState.COUNTDOWN;
     }
 
     public int getTickCount() {
@@ -82,7 +88,18 @@ public class BrawlGame {
 
     // ---- GAME STATE CHANGES ----
 
-    public void startGame() {
+    private void startGame() {
+        countdown.cancel();
+        warpAllToCenter();
+        // Transition any players in countdown to their loadout
+        for(BrawlPlayer player : brawlPlayerList.values()) {
+            player.reset();
+            // Apply loadout
+            Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player.getPlayer()).getCurrentLoadout();
+            loadout.applyToPlayer(player);
+            // Hardcoded arrows
+            ItemManager.getManager().giveItemToPlayer("galvan", 64, player.getPlayer());
+        }
         updateBrawlPlayers = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             for(BrawlPlayer player : brawlPlayerList.values()) {
                 player.update();
@@ -93,7 +110,28 @@ public class BrawlGame {
             }
             tickCounter++;
         }, TaskSchedule.immediate(), TaskSchedule.tick(1));
-        warpAllToCenter();
+    }
+
+    private void startCountdown() {
+        for(BrawlPlayer player : brawlPlayerList.values()) {
+           player.getPlayer().playSound(Sound.sound(SoundEvent.BLOCK_NOTE_BLOCK_CHIME, Sound.Source.MASTER, 1f, 1f));
+        }
+        AtomicInteger countdownTime = new AtomicInteger(15);
+        countdown = MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            int time = countdownTime.getAndDecrement();
+            if(time <= 0) {
+                transitionToState(GameState.GAME);
+                return;
+            }
+            for(BrawlPlayer player : brawlPlayerList.values()) {
+                player.getPlayer().showTitle(
+                        Title.title(Component.empty(),
+                                Component.text(time, NamedTextColor.AQUA),
+                                Title.Times.times(Ticks.duration(5), Ticks.duration(12), Ticks.duration(3))
+                        )
+                );
+            }
+        }, TaskSchedule.nextTick(), TaskSchedule.seconds(1));
     }
 
     // ----- BRAWL PLAYER ADD/REMOVE/ACCESS -----
@@ -117,13 +155,22 @@ public class BrawlGame {
             logger.warn("Attempted to add player " + player.getName() + " to the Brawl Player List List, but they are already in it!");
             return;
         }
-        // Get their loadout
-        Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player).getCurrentLoadout();
         brawlPlayerList.put(id, new BrawlPlayer(player, this));
-        loadout.applyToPlayer(brawlPlayerList.get(id));
         brawlSidebar.addViewer(player);
-        // Hardcoded arrows
-        ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
+        switch (gameState) {
+            case LOBBY, COUNTDOWN -> {
+                // Default lobby loadout
+                brawlPlayerList.get(id).giveActionItemType(ActionItemType.OPEN_KIT_MENU);
+                brawlPlayerList.get(id).giveActionItemType(ActionItemType.READY_ITEM);
+            }
+            case GAME -> {
+                // Apply loadout
+                Loadout loadout = BrawlPlayerDataManager.getManager().getPlayerData(player).getCurrentLoadout();
+                loadout.applyToPlayer(brawlPlayerList.get(id));
+                // Hardcoded arrows
+                ItemManager.getManager().giveItemToPlayer("galvan", 64, player);
+            }
+        }
     }
     public void removeBrawlPlayer(Player player) {
         brawlPlayerList.remove(player.getUuid());
@@ -166,6 +213,7 @@ public class BrawlGame {
     }
 
     public void resetBrawlPlayer(BrawlPlayer player) {
+        broadcastToPlayers(Component.text("Testing"));
         player.getPlayer().teleport(centerPos);
         player.resetDamage();
     }
@@ -173,16 +221,6 @@ public class BrawlGame {
     public void broadcastToPlayers(Component message) {
         brawlSidebar.sendMessage(message);
     }
-
-    // LOBBY
-
-    private final Set<Player> lobbyPlayers = new HashSet<>();
-
-    private void addLobbyPlayer() {
-
-    }
-
-
 
     // GAME STATE
 
@@ -192,9 +230,33 @@ public class BrawlGame {
         if(gameState == requiredState) {
             gameState = state;
             brawlSidebar.updateLineContent("state", Component.text(gameState.name()));
-            state.onTransitionTo(this);
+            switch (gameState) {
+                case COUNTDOWN -> startCountdown();
+                case GAME -> startGame();
+                case END -> MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+                    broadcastToPlayers(Component.text("The Game has ended!", NamedTextColor.RED));
+                    stop();
+                    GameCore.getGameCore().createNewBrawlGame();
+                }, TaskSchedule.seconds(30), TaskSchedule.stop());
+            }
         } else {
             logger.warn("Attempted to change to state " + state.name() + ", but current state is " + gameState.name() + "!");
+        }
+    }
+
+    public void toggleReadyState(BrawlPlayer player) {
+        if(gameState != GameState.LOBBY) return;
+
+        if(brawlPlayerList.containsValue(player)) {
+            if(readyPlayerList.contains(player.getPlayer().getUuid())) {
+                readyPlayerList.remove(player.getPlayer().getUuid());
+            } else {
+                readyPlayerList.add(player.getPlayer().getUuid());
+                // Check if we should start the countdown
+                if(readyPlayerList.size() == brawlPlayerList.size()) {
+                    transitionToState(GameState.COUNTDOWN);
+                }
+            }
         }
     }
 
@@ -203,10 +265,17 @@ public class BrawlGame {
      */
     public void stop() {
         for(BrawlPlayer player : brawlPlayerList.values()) {
-            // player.reset(); - Doesn't currently exist yet
+            player.reset();
             brawlSidebar.removeViewer(player.getPlayer());
+            player.getPlayer().setInstance(WorldManager.getManager().getDefaultWorld(), WorldManager.getManager().getDefaultWorldSpawnPos());
         }
-        updateBrawlPlayers.cancel();
+        brawlPlayerList.clear();
+        if(updateBrawlPlayers != null && updateBrawlPlayers.isAlive()) {
+            updateBrawlPlayers.cancel();
+        }
+        if(countdown != null && countdown.isAlive()) {
+            countdown.cancel();
+        }
         events.unregisterEvents();
     }
 }
